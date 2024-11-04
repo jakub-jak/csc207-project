@@ -1,7 +1,10 @@
 # csc207-project
 Ali Elbadrawy - alihosam-dev
+
 Jakub Jakuszewski - slendyduck
+
 Chet Petro - chetpetro
+
 Dimitar Toshev - toshoboss
 
 Alex received his digest today and saw a politics article within the digest and decided he doesn’t want to receive articles of that topic anymore. Alex logs onto the program and clicks on the Update Preferences button and de-selects politics, then clicks save. The next digest he receives doesn’t contain any articles related to politics. [Ali’s Story]
