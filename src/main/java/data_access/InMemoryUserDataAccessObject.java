@@ -3,9 +3,7 @@ package data_access;
 import entity.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * In-memory implementation of the DAO for storing user data. This implementation does
@@ -13,6 +11,7 @@ import java.util.Map;
  */
 public class InMemoryUserDataAccessObject {
 
+    private String currentUserName;
     private final List<User> Users = new ArrayList<User>();
 
     public boolean existsByName(String name) {
@@ -29,5 +28,9 @@ public class InMemoryUserDataAccessObject {
             if (user.getName().equals(name)) return user;
         }
         return null;
+    }
+
+    public void setCurrentUserName(String name) {
+        this.currentUserName = name;
     }
 }
