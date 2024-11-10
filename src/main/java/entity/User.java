@@ -41,4 +41,14 @@ public interface User {
      * Update user articles
      */
     void setArticles(Map<String,List<Article>> articles);
+
+    /**
+     * Adds one article
+     */
+    void addArticle(Article article);
+
+    /**
+     * Deletes one article
+     */
+    void deleteArticle(Article article);
 }
