@@ -45,4 +45,14 @@ public class CommonUser implements User {
     public void setArticles(Map<String,List<Article>> articles) {
         this.articles = articles;
     }
+
+    @Override
+    public void addArticle(Article article) {
+        articles.get(article.getCategory()).add(article);
+    }
+
+    @Override
+    public void deleteArticle(Article article) {
+        articles.get(article.getCategory()).remove(article);
+    }
 }
