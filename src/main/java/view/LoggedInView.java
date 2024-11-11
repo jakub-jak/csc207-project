@@ -45,7 +45,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         categoryButtonsPanel = new JPanel();
         categoryPanel.add(inputPanel);
         categoryPanel.add(categoryButtonsPanel);
-        categoryButtonsPanel.add(generateButton);
+        categoryPanel.add(generateButton);
 
         // Article Panel
         articlePanel = new JPanel();
