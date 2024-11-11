@@ -1,17 +1,13 @@
 package view;
 
-import interface_adapter.loggedin.LoggedInState;
-import interface_adapter.loggedin.LoggedInViewModel;
-import interface_adapter.loggedin.LogoutController;
+import entity.Article;
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 /**
  * The View for when the user is logged into the program.
@@ -20,123 +16,88 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     private final String viewName = "logged in";
     private final LoggedInViewModel loggedInViewModel;
-
-    private final JLabel passwordErrorField = new JLabel();
-    private LogoutController logoutController;
-
-    private final JLabel username;
-    private final JButton logOut;
+    private final JPanel categoryButtonsPanel;
+    private final JPanel articlePanel;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
-        final JLabel title = new JLabel("Logged In Screen");
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // Navbar Panel
+        JPanel navigationPanel = new JPanel();
+        // TODO add method for handling pressing the Saved Articles Button to switch view
+        JButton savedArticlesButton = new JButton("Saved Articles");
+        JLabel newsLabel = new JLabel("News");
+        // TODO add method for handling pressing the Log out Button to switch view
+        JButton logoutButton = new JButton("Log out");
+        navigationPanel.add(savedArticlesButton);
+        navigationPanel.add(newsLabel);
+        navigationPanel.add(logoutButton);
 
-        // Text field for category input
+        // Category Panel
+        JPanel categoryPanel = new JPanel();
         JPanel inputPanel = new JPanel();
         JTextField categoryField = new JTextField(16);
         inputPanel.add(new JLabel("Enter Category:"));
+        // TODO add method for handling pressing the generate button
+        JButton generateButton = new JButton("Generate");
         inputPanel.add(categoryField);
+        categoryButtonsPanel = new JPanel();
+        categoryPanel.add(inputPanel);
+        categoryPanel.add(categoryButtonsPanel);
+        categoryButtonsPanel.add(generateButton);
 
-        // Panel for buttons (add, remove, update preferences)
-        JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Add Category");
-        JButton removeButton = new JButton("Remove Category");
-        JButton updateButton = new JButton("Update Preferences");
-        buttonPanel.add(addButton);
-        buttonPanel.add(removeButton);
-        buttonPanel.add(updateButton);
+        // Article Panel
+        articlePanel = new JPanel();
 
-        // Panel to display categories
-        JPanel listPanel = new JPanel();
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        JList<String> categoryList = new JList<>(listModel);
-        JScrollPane scrollPane = new JScrollPane(categoryList);
-        listPanel.add(scrollPane);
 
-        // Update the main window
-        this.add(inputPanel, BorderLayout.NORTH);
-        this.add(buttonPanel, BorderLayout.CENTER);
-        this.add(listPanel, BorderLayout.SOUTH);
-
-        final JLabel usernameInfo = new JLabel("Currently logged in: ");
-        username = new JLabel();
-
-        final JPanel buttons = new JPanel();
-        logOut = new JButton("Log Out");
-        buttons.add(logOut);
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        logOut.addActionListener(
-                // This creates an anonymous subclass of ActionListener and instantiates it.
-                evt -> {
-                    if (evt.getSource().equals(logOut)) {
-                        // 1. get the state out of the loggedInViewModel. It contains the username.
-                        // 2. Execute the logout Controller.
-                        final LoggedInState currentState = loggedInViewModel.getState();
-                        this.logoutController.execute(currentState.getUsername());
-                    }
-                }
-        );
-
-        // Action listener for adding a category
-        addButton.addActionListener((ActionEvent e) -> {
-            String category = categoryField.getText().trim();
-            if (!category.isEmpty() && !categoriesList.contains(category)) {
-                categoriesList.add(category);
-                listModel.addElement(category);  // Add category to list view
-                categoryField.setText("");  // Clear the input field
-            } else {
-                JOptionPane.showMessageDialog(this, "Category is empty or already exists!");
-            }
-        });
-
-        // Action listener for removing a selected category
-        removeButton.addActionListener((ActionEvent e) -> {
-            String selectedCategory = categoryList.getSelectedValue();
-            if (selectedCategory != null) {
-                categoriesList.remove(selectedCategory);
-                listModel.removeElement(selectedCategory);  // Remove category from the list view
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select a category to remove!");
-            }
-        });
-
-        // Action listener for updating preferences (storing the list of categories)
-        updateButton.addActionListener((ActionEvent e) -> {
-            // Once the "Update Preferences" button is pressed, update currentUser's categories
-            currentUser.setCategories(new ArrayList<>(categoriesList));
-
-            StringBuilder sb = new StringBuilder("Saved Categories:\n");
-            for (String category : categoriesList) {
-                sb.append(category).append("\n");
-            }
-            JOptionPane.showMessageDialog(this, sb.toString(), "Preferences Updated", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        this.add(title);
-        this.add(usernameInfo);
-        this.add(username);
-        this.add(passwordErrorField);
-        this.add(buttons);
+        this.add(navigationPanel, BorderLayout.NORTH);
+        this.add(categoryPanel, BorderLayout.CENTER);
+        this.add(articlePanel, BorderLayout.SOUTH);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("state")) {
+        // TODO add propertyChangeEvent for category
+        // Populate the categoryPanel with buttons for each category that the user has.
+        if (evt.getPropertyName().equals("category")) {
             final LoggedInState state = (LoggedInState) evt.getNewValue();
-            username.setText(state.getUsername());
+            categoryButtonsPanel.removeAll();
+            for (String category: state.getCategoriesList()){
+                JButton categoryButton = new JButton(category);
+                // TODO add actionListener to each button that deletes it when it is pressed
+                categoryButton.addActionListener(e -> {});
+                categoryButtonsPanel.add(categoryButton);
+            }
+        }
+
+        // TODO add propertyChangeEvent for articles
+        // Populate the articlePanel with articles for each article the user generates.
+        if (evt.getPropertyName().equals("articles")) {
+            final LoggedInState state = (LoggedInState) evt.getNewValue();
+            articlePanel.removeAll();
+            for (Article article: state.getArticleList()){
+                JPanel articleSlide = new JPanel();
+                JLabel articleTitle = new JLabel(article.getTitle());
+                JLabel articleAuthor = new JLabel(article.getAuthor());
+                JLabel articleDate = new JLabel(article.getDate());
+                JLabel articleLink = new JLabel(article.getLink());
+                JLabel articleDescription = new JLabel(article.getDescription());
+                JButton saveButton = new JButton("Save");
+                // TODO add actionListener to save button that saves it to the user DB when it is pressed
+                saveButton.addActionListener(e -> {});
+                articleSlide.add(articleTitle);
+                articleSlide.add(articleAuthor);
+                articleSlide.add(articleDate);
+                articleSlide.add(articleLink);
+                articleSlide.add(articleDescription);
+                articleSlide.add(saveButton);
+                articlePanel.add(articleSlide);
+            }
         }
     }
 
     public String getViewName() {
         return viewName;
-    }
-
-    public void setLogoutController(LogoutController logoutController) {
-        this.logoutController = logoutController;
     }
 }
