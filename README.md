@@ -7,6 +7,8 @@ Chet Petro - chetpetro
 
 Dimitar Toshev - toshoboss
 
+Hriday Chhaochharia - hridaychh
+
 Alex received his digest today and saw a politics article within the digest and decided he doesn’t want to receive articles of that topic anymore. Alex logs onto the program and clicks on the Update Preferences button and de-selects politics, then clicks save. The next digest he receives doesn’t contain any articles related to politics. [Ali’s Story]
 
 John wants to stay updated on technology news. He signs into the app and selects "Technology" and "Artificial Intelligence" as his topics. The next day, he receives an email digest with article titles, summaries, and links, and clicks on a link to read more about AI. [Jakub’s Story]
