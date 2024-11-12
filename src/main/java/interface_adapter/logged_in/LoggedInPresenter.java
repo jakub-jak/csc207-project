@@ -23,7 +23,7 @@ public class LoggedInPresenter {
         this.loggedInViewModel = loggedInViewModel;
         this.loginViewModel = loginViewModel;
     }
-    // TODO: Implement use cases for the prepareSuccessView Overloading
+    // TODO: Uncomment after implementing use cases for the prepareSuccessView Overloading
 //
 //    // Update LoggedInState with new categories following the updateCategory UseCase
 //    @Override
