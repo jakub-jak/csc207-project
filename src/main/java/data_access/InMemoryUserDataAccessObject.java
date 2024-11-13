@@ -1,6 +1,8 @@
 package data_access;
 
 import entity.User;
+import use_case.login.LoginUserDataAccessInterface;
+import use_case.signup.SignupUserDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.List;
  * In-memory implementation of the DAO for storing user data. This implementation does
  * NOT persist data between runs of the program.
  */
-public class InMemoryUserDataAccessObject {
+public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface {
 
     private String currentUserName;
     private final List<User> Users = new ArrayList<User>();
@@ -30,7 +32,13 @@ public class InMemoryUserDataAccessObject {
         return null;
     }
 
-    public void setCurrentUserName(String name) {
+    public void setCurrentUser(String name) {
         this.currentUserName = name;
     }
+
+    public String getCurrentUser() {
+        if (currentUserName == null) return null;
+        return currentUserName;
+    }
+
 }
