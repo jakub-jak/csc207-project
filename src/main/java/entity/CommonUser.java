@@ -47,6 +47,12 @@ public class CommonUser implements User {
     }
 
     @Override
+    public void addCategory(String category) { categories.add(category); }
+
+    @Override
+    public void deleteCategory(String category) { categories.remove(category); }
+
+    @Override
     public void addArticle(Article article) {
         articles.get(article.getCategory()).add(article);
     }

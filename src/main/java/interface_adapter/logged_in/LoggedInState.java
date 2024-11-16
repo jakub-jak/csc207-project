@@ -45,4 +45,8 @@ public class LoggedInState {
     public String getLoggedInError() { return loggedInError; }
 
     public void setLoggedInError(String loggedInError) { this.loggedInError = loggedInError; }
+
+    public void addCategory(String category) { this.categoriesList.add(category); }
+
+    public void removeCategory(String category) { this.categoriesList.remove(category); }
 }

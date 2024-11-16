@@ -43,6 +43,16 @@ public interface User {
     void setArticles(Map<String,List<Article>> articles);
 
     /**
+     * Adds one category
+     */
+    void addCategory(String category);
+
+    /**
+     * Deletes one category
+     */
+    void deleteCategory(String category);
+
+    /**
      * Adds one article
      */
     void addArticle(Article article);
