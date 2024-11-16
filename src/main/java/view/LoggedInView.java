@@ -1,11 +1,14 @@
 package view;
 
 import entity.Article;
+import interface_adapter.logged_in.AddCategoryController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.logged_in.RemoveCategoryController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -19,9 +22,20 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private final JPanel categoryButtonsPanel;
     private final JPanel articlePanel;
 
-    public LoggedInView(LoggedInViewModel loggedInViewModel) {
+    private final AddCategoryController addCategoryController;
+    private final RemoveCategoryController removeCategoryController;
+
+    public LoggedInView(LoggedInViewModel loggedInViewModel,
+                        AddCategoryController addCategoryController,
+                        RemoveCategoryController removeCategoryController) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
+
+        // the initial state of the logged in view, containing the current user and saved categories
+        LoggedInState initalState = loggedInViewModel.getState();
+
+        this.addCategoryController = addCategoryController;
+        this.removeCategoryController = removeCategoryController;
 
         // Navbar Panel
         JPanel navigationPanel = new JPanel();
@@ -34,15 +48,41 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         navigationPanel.add(newsLabel);
         navigationPanel.add(logoutButton);
 
+
+        // Input panel
+        JPanel inputPanel = new JPanel();
+        inputPanel.add(new JLabel("Enter Category:"));
+
+        JTextField categoryField = new JTextField(16);
+        inputPanel.add(categoryField);
+
+        // add category button and use case
+        JButton addCategoryButton = new JButton("Add Category");
+        addCategoryButton.addActionListener(e -> {
+            String category = categoryField.getText();  // Get the category name from the text field
+            this.addCategoryController.execute(initalState.getUsername(), category); // Execute AddCategory use case
+            categoryField.setText(""); // Clear the text field after adding the category
+        });
+
+        inputPanel.add(addCategoryButton);
+
         // Category Panel
         JPanel categoryPanel = new JPanel();
-        JPanel inputPanel = new JPanel();
-        JTextField categoryField = new JTextField(16);
-        inputPanel.add(new JLabel("Enter Category:"));
+
+        categoryButtonsPanel = new JPanel();
+        categoryButtonsPanel.setLayout(new FlowLayout());
+        // Populate the categoryButtonsPanel with the saved categories of the current user
+        for (String category: initalState.getCategoriesList()){
+            JButton categoryButton = createCategoryButton(initalState.getUsername(), category);
+            categoryButtonsPanel.add(categoryButton);
+        }
+        categoryButtonsPanel.revalidate();    // Revalidate the layout
+        categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+
         // TODO add method for handling pressing the generate button
         JButton generateButton = new JButton("Generate");
-        inputPanel.add(categoryField);
-        categoryButtonsPanel = new JPanel();
+
+        // inputPanel.add(generateButton);  // consider putting this in the input panel
         categoryPanel.add(inputPanel);
         categoryPanel.add(categoryButtonsPanel);
         categoryPanel.add(generateButton);
@@ -58,18 +98,29 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+
+        if (evt.getPropertyName().startsWith("add category: ")){
+            final LoggedInState state = (LoggedInState) evt.getNewValue();
+            String user = state.getUsername();
+            String category = evt.getPropertyName().substring("add category: ".length());
+            JButton categoryButton = createCategoryButton(user, category);
+            categoryButtonsPanel.add(categoryButton);
+            categoryButtonsPanel.revalidate();    // Revalidate the layout
+            categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+        }
+
         // TODO add propertyChangeEvent for category
         // Populate the categoryPanel with buttons for each category that the user has.
-        if (evt.getPropertyName().equals("category")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            categoryButtonsPanel.removeAll();
-            for (String category: state.getCategoriesList()){
-                JButton categoryButton = new JButton(category);
-                // TODO add actionListener to each button that deletes it when it is pressed
-                categoryButton.addActionListener(e -> {});
-                categoryButtonsPanel.add(categoryButton);
-            }
-        }
+//        if (evt.getPropertyName().contains("category")) {
+//            final LoggedInState state = (LoggedInState) evt.getNewValue();
+//            String user = state.getUsername();
+//
+//            categoryButtonsPanel.removeAll();
+//            for (String category: state.getCategoriesList()){
+//                JButton categoryButton = createCategoryButton(user, category);
+//                categoryButtonsPanel.add(categoryButton);
+//            }
+//        }
 
         // TODO add propertyChangeEvent for articles
         // Populate the articlePanel with articles for each article the user generates.
@@ -99,5 +150,19 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     public String getViewName() {
         return viewName;
+    }
+
+    private JButton createCategoryButton(String user, String category) {
+        JButton categoryButton = new JButton(category);
+        categoryButton.addActionListener(e -> {
+            // execute remove category use case
+            this.removeCategoryController.execute(user, category);
+
+            // Remove this button from the panel
+            categoryButtonsPanel.remove(categoryButton);
+            categoryButtonsPanel.revalidate();    // Revalidate the layout
+            categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+        });
+        return categoryButton;
     }
 }
