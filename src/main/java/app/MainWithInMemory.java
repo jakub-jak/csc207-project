@@ -1,29 +1,23 @@
 package app;
 
-import entity.CommonUser;
-import entity.User;
+import data_access.InMemoryUserDataAccessObject;
+import interface_adapter.ViewManagerModel;
+import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.login.LoginViewModel;
+import interface_adapter.signup.SignupViewModel;
+import view.LoggedInView;
+import view.LoginView;
+import view.SignupView;
+import view.ViewManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * The version of Main with a simple GUI.
+ * The version of Main with in memory DAO.
  */
 public class MainWithInMemory {
-    // Create a CommonUser instance (with sample data)
-    private static User currentUser = new CommonUser(
-            "john_doe",
-            "password123",
-            new ArrayList<>(),
-            null
-    );
-
-    // Temporary list that mirrors the currentUser's categories
-    private static List<String> categoriesList = new ArrayList<>(currentUser.getCategories());
 
     /**
      * The main method for starting the program.
@@ -31,74 +25,49 @@ public class MainWithInMemory {
      */
     public static void main(String[] args) {
 
+        // Build the main program window, the main panel containing the
+        // various cards, and the layout, and stitch them together.
+
         // The main application window.
-        final JFrame application = new JFrame("Demo");
+        final JFrame application = new JFrame("Login Example");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        application.setLayout(new BorderLayout());  // Use BorderLayout for better component arrangement
 
-        // Text field for category input
-        JPanel inputPanel = new JPanel();
-        JTextField categoryField = new JTextField(16);
-        inputPanel.add(new JLabel("Enter Category:"));
-        inputPanel.add(categoryField);
+        final CardLayout cardLayout = new CardLayout();
 
-        // Panel for buttons (add, remove, update preferences)
-        JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Add Category");
-        JButton removeButton = new JButton("Remove Category");
-        JButton updateButton = new JButton("Update Preferences");
-        buttonPanel.add(addButton);
-        buttonPanel.add(removeButton);
-        buttonPanel.add(updateButton);
+        // The various View objects. Only one view is visible at a time.
+        final JPanel views = new JPanel(cardLayout);
+        application.add(views);
 
-        // Panel to display categories
-        JPanel listPanel = new JPanel();
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        JList<String> categoryList = new JList<>(listModel);
-        JScrollPane scrollPane = new JScrollPane(categoryList);
-        listPanel.add(scrollPane);
 
-        // Update the main window
-        application.add(inputPanel, BorderLayout.NORTH);
-        application.add(buttonPanel, BorderLayout.CENTER);
-        application.add(listPanel, BorderLayout.SOUTH);
+        // This keeps track of and manages which view is currently showing.
+        final ViewManagerModel viewManagerModel = new ViewManagerModel();
+        new ViewManager(views, cardLayout, viewManagerModel);
 
-        // Action listener for adding a category
-        addButton.addActionListener((ActionEvent e) -> {
-            String category = categoryField.getText().trim();
-            if (!category.isEmpty() && !categoriesList.contains(category)) {
-                categoriesList.add(category);
-                listModel.addElement(category);  // Add category to list view
-                categoryField.setText("");  // Clear the input field
-            } else {
-                JOptionPane.showMessageDialog(application, "Category is empty or already exists!");
-            }
-        });
+        // The data for the views, such as username and password, are in the ViewModels.
+        // This information will be changed by a presenter object that is reporting the
+        // results from the use case. The ViewModels are "observable", and will
+        // be "observed" by the Views.
+        final LoginViewModel loginViewModel = new LoginViewModel();
+        final LoggedInViewModel loggedInViewModel = new LoggedInViewModel();
+        final SignupViewModel signupViewModel = new SignupViewModel();
 
-        // Action listener for removing a selected category
-        removeButton.addActionListener((ActionEvent e) -> {
-            String selectedCategory = categoryList.getSelectedValue();
-            if (selectedCategory != null) {
-                categoriesList.remove(selectedCategory);
-                listModel.removeElement(selectedCategory);  // Remove category from the list view
-            } else {
-                JOptionPane.showMessageDialog(application, "Please select a category to remove!");
-            }
-        });
+        final InMemoryUserDataAccessObject userDataAccessObject = new InMemoryUserDataAccessObject();
 
-        // Action listener for updating preferences (storing the list of categories)
-        updateButton.addActionListener((ActionEvent e) -> {
-            // Once the "Update Preferences" button is pressed, update currentUser's categories
-            currentUser.setCategories(new ArrayList<>(categoriesList));
+        final SignupView signupView = SignupUseCaseFactory.create(viewManagerModel, loginViewModel,
+                signupViewModel, userDataAccessObject);
+        views.add(signupView, signupView.getViewName());
 
-            StringBuilder sb = new StringBuilder("Saved Categories:\n");
-            for (String category : categoriesList) {
-                sb.append(category).append("\n");
-            }
-            JOptionPane.showMessageDialog(application, sb.toString(), "Preferences Updated", JOptionPane.INFORMATION_MESSAGE);
-        });
+        final LoginView loginView = LoginUseCaseFactory.create(viewManagerModel, loginViewModel,
+                loggedInViewModel, userDataAccessObject);
+        views.add(loginView, loginView.getViewName());
 
-        // Finalize and show the frame
+        final LoggedInView loggedInView = LoggedinUseCasesFactory.create(viewManagerModel,
+                loggedInViewModel, loginViewModel, userDataAccessObject, userDataAccessObject);
+        views.add(loggedInView, loggedInView.getViewName());
+
+        viewManagerModel.setState(signupView.getViewName());
+        viewManagerModel.firePropertyChanged();
+
         application.pack();
         application.setVisible(true);
 

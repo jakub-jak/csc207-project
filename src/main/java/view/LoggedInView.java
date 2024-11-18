@@ -90,10 +90,10 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         // Article Panel
         articlePanel = new JPanel();
 
-
-        this.add(navigationPanel, BorderLayout.NORTH);
-        this.add(categoryPanel, BorderLayout.CENTER);
-        this.add(articlePanel, BorderLayout.SOUTH);
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.add(navigationPanel);
+        this.add(categoryPanel);
+        this.add(articlePanel);
     }
 
     @Override
