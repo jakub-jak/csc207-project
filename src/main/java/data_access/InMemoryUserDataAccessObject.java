@@ -25,18 +25,18 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
 
     public void save(User user) { Users.add(user); }
 
-    public User get(String name) {
+    public User get() {
         for (User user : Users) {
             if (user.getName().equals(name)) return user;
         }
         return null;
     }
 
-    public void setCurrentUser(String name) {
+    public void setCurrentUsername(String name) {
         this.currentUserName = name;
     }
 
-    public String getCurrentUser() {
+    public String getCurrentUsername() {
         if (currentUserName == null) return null;
         return currentUserName;
     }

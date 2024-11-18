@@ -19,7 +19,7 @@ public class AddCategoryInteractor implements AddCategoryInputBoundary {
     public void execute(AddCategoryInputData addCategoryInputData) {
         final String username = addCategoryInputData.getUsername();
         final String inputCategory = addCategoryInputData.getCategory();
-        final List<String> categories = addcategoryDataAccessObject.getUserCategories(username);
+        final List<String> categories = addcategoryDataAccessObject.getUserCategories();
 
         if (categories.contains(inputCategory)) {
             addCategoryPresenter.prepareFailView("Category already exists.");
