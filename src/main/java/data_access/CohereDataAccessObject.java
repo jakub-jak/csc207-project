@@ -3,6 +3,7 @@ package data_access;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import okhttp3.*;
+import use_case.digest.DigestCohereDataAccessInterface;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,7 +13,7 @@ import java.util.Properties;
 /**
  * The DAO for interacting with the Cohere API.
  */
-public class CohereDataAccessObject {
+public class CohereDataAccessObject implements DigestCohereDataAccessInterface {
     // Constants
     private static final String BASE_URL = "https://api.cohere.ai/v1/";
     private static final String API_KEY;

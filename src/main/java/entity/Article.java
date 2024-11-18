@@ -45,4 +45,9 @@ public interface Article {
      * @return the description of the article.
      */
     String getDescription();
+
+    /**
+     * Sets the description of the article.
+     */
+    void setDescription(String description);
 }

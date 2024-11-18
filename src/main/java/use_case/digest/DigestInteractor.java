@@ -9,10 +9,12 @@ import java.util.List;
 public class DigestInteractor implements DigestInputBoundary{
 
     private final DigestNewsDataAccessInterface digestNewsDataAccessInterface;
+    private final DigestCohereDataAccessInterface digestCohereDataAccessInterface;
     private final DigestOutputBoundary digestPresenter;
 
-    public DigestInteractor(DigestNewsDataAccessInterface digestNewsDataAccessInterface, DigestOutputBoundary digestPresenter) {
+    public DigestInteractor(DigestNewsDataAccessInterface digestNewsDataAccessInterface, DigestCohereDataAccessInterface digestCohereDataAccessInterface, DigestOutputBoundary digestPresenter) {
         this.digestNewsDataAccessInterface = digestNewsDataAccessInterface;
+        this.digestCohereDataAccessInterface = digestCohereDataAccessInterface;
         this.digestPresenter = digestPresenter;
     }
 
@@ -31,12 +33,20 @@ public class DigestInteractor implements DigestInputBoundary{
         try {
             articles = digestNewsDataAccessInterface.fetchArticlesByKeyword(keyword, fromDate, toDate, language, sortBy, page, pageSize);
         } catch (IOException e) {
-            digestPresenter.prepareFailView("Error in fetching articles");
+            digestPresenter.handleError("Error in fetching articles");
             e.printStackTrace();
         }
 
-        final DigestOutputData digestOutputData = new DigestOutputData(articles);
+        for (Article article : articles) {
+            try {
+                article.setDescription(digestCohereDataAccessInterface.summarize(article.getContent()));
+            } catch (IOException e) {
+                article.setDescription("Error in summarizing article");
+                e.printStackTrace();
+            }
+        }
 
-        digestPresenter.prepareSuccessView(digestOutputData);
+        final DigestOutputData digestOutputData = new DigestOutputData(articles);
+        digestPresenter.processOutput(digestOutputData);
     }
 }

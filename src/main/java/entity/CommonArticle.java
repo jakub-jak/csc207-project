@@ -7,14 +7,16 @@ public class CommonArticle implements Article {
     private final String content;
     private final String link;
     private final String date;
+    private String description;
 
-    public CommonArticle(String title, String author, String category, String content, String link, String date) {
+    public CommonArticle(String title, String author, String category, String content, String link, String date, String description) {
         this.title = title;
         this.author = author;
         this.category = category;
         this.content = content;
         this.link = link;
         this.date = date;
+        this.description = description;
     }
 
 
@@ -37,5 +39,10 @@ public class CommonArticle implements Article {
     public String getDate() { return date; }
 
     @Override
-    public String getDescription() { return ""; }
+    public String getDescription() { return description; }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

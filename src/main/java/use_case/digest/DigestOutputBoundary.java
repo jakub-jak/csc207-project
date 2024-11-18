@@ -1,7 +1,11 @@
 package use_case.digest;
 
 public interface DigestOutputBoundary {
-    void prepareFailView(String errorMessage);
+    void handleError(String errorMessage);
 
-    void prepareSuccessView(DigestOutputData outputData);
+    void processOutput(DigestOutputData outputData);
+
+    DigestOutputData getOutputData();
+
+    String getErrorMessage();
 }

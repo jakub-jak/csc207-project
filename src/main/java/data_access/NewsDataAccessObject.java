@@ -84,8 +84,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                                 ? articleObject.get("url").getAsString() : "";
                         String date = articleObject.has("publishedAt") && !articleObject.get("publishedAt").isJsonNull()
                                 ? articleObject.get("publishedAt").getAsString() : "";
-                        String description = articleObject.has("description") && !articleObject.get("description").isJsonNull()
-                                ? articleObject.get("description").getAsString() : "";
+                        String description = "";
 
                         // Fetch the article content from the URL
                         String content = "";
@@ -119,7 +118,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                         // Category is not available in the JSON, so set to an empty string
                         String category = "";
 
-                        Article article = new CommonArticle(title, author, category, content, link, date);
+                        Article article = new CommonArticle(title, author, category, content, link, date, description);
                         articles.add(article);
                     }
                     return articles;
