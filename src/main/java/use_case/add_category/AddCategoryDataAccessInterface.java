@@ -8,7 +8,7 @@ public interface AddCategoryDataAccessInterface {
      * @param username the user to save
      * @param category the category to save
      */
-    void saveCategory(String username, String category);
+    void saveAddedCategory(String username, String category);
 
     /**
      * Gets the given user's category list.

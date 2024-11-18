@@ -4,6 +4,7 @@ import entity.Article;
 import entity.CommonUser;
 import entity.User;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class SignupInteractor implements SignupInputBoundary {
             userPresenter.prepareFailView("Passwords don't match.");
         }
         else {
-            final User user = new CommonUser(signupInputData.getUsername(), signupInputData.getPassword(), Collections.emptyList(), Collections.emptyMap());
+            final User user = new CommonUser(signupInputData.getUsername(), signupInputData.getPassword(), new ArrayList<>(), Collections.emptyMap());
             userDataAccessObject.save(user);
 
             final SignupOutputData signupOutputData = new SignupOutputData(user.getName(), false);

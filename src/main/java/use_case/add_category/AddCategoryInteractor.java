@@ -1,17 +1,21 @@
 package use_case.add_category;
 
+import entity.CommonUser;
+import entity.User;
+
+import java.util.Collections;
 import java.util.List;
 
 /**
  * The AddCategory Interactor.
  */
 public class AddCategoryInteractor implements AddCategoryInputBoundary {
-    private final AddCategoryDataAccessInterface addcategoryDataAccessObject;
+    private final AddCategoryDataAccessInterface addCategoryDataAccessObject;
     private final AddCategoryOutputBoundary addCategoryPresenter;
 
     public AddCategoryInteractor(AddCategoryDataAccessInterface addCategoryDataAccessInterface,
                            AddCategoryOutputBoundary addCategoryOutputBoundary) {
-        this.addcategoryDataAccessObject = addCategoryDataAccessInterface;
+        this.addCategoryDataAccessObject = addCategoryDataAccessInterface;
         this.addCategoryPresenter = addCategoryOutputBoundary;
     }
 
@@ -19,13 +23,14 @@ public class AddCategoryInteractor implements AddCategoryInputBoundary {
     public void execute(AddCategoryInputData addCategoryInputData) {
         final String username = addCategoryInputData.getUsername();
         final String inputCategory = addCategoryInputData.getCategory();
-        final List<String> categories = addcategoryDataAccessObject.getUserCategories(username);
+        final List<String> categories = addCategoryDataAccessObject.getUserCategories(username);
 
         if (categories.contains(inputCategory)) {
             addCategoryPresenter.prepareFailView("Category already exists.");
         } else if (inputCategory.isEmpty()) {
             addCategoryPresenter.prepareFailView("Please enter a valid category.");
         } else {
+            addCategoryDataAccessObject.saveAddedCategory(username, inputCategory);
             final AddCategoryOutputData addCategoryOutputData =
                     new AddCategoryOutputData(username, inputCategory, false);
             addCategoryPresenter.prepareSuccessView(addCategoryOutputData);
