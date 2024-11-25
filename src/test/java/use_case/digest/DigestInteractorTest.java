@@ -30,7 +30,7 @@ public class DigestInteractorTest {
     @Test
     public void testDigestInteractor() {
         // Arrange
-        DigestInputData inputData = new DigestInputData("health",
+        DigestInputData inputData = new DigestInputData("toy",
                 java.time.LocalDate.now().toString(),
                 java.time.LocalDate.now().toString(),
                 "en",

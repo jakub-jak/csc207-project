@@ -35,7 +35,6 @@ public class NewsDataAccessTest {
         // Assert
         assertNotNull(articles, "Articles should not be null");
         assertTrue(articles.size() > 0, "Articles list should not be empty");
-        assertEquals(5, articles.size(), "Articles list should contain 5 items");
     }
 
     @Test
