@@ -6,6 +6,8 @@ import entity.User;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The Signup Interactor.
@@ -23,6 +25,12 @@ public class SignupInteractor implements SignupInputBoundary {
 
     @Override
     public void execute(SignupInputData signupInputData) {
+        Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+        Matcher m = p.matcher(signupInputData.getUsername());
+        boolean matchFound = m.matches();
+        if(!matchFound) {
+            userPresenter.prepareFailView("This has to be a valid email address");
+        }
         if (userDataAccessObject.existsByName(signupInputData.getUsername())) {
             userPresenter.prepareFailView("User already exists.");
         }
