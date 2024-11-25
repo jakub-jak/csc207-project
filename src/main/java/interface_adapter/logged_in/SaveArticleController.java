@@ -16,7 +16,7 @@ public class SaveArticleController {
 
     /**
      * Executes the SaveArticle Use Case.
-     * @param article the category to add
+     * @param article the article to add
      */
     public void execute(Article article) {
         final SaveArticleInputData saveArticleInputData = new SaveArticleInputData(article);
