@@ -88,6 +88,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
 
                         // Fetch the article content from the URL
                         String content = "";
+                        boolean isContentFetched = false;
                         try {
                             // Fetch the HTML content of the article URL
                             Request articleRequest = new Request.Builder()
@@ -104,6 +105,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
 
                                     // Attempt to extract the main content
                                     content = extractMainContent(doc);
+                                    isContentFetched = true;
 
                                 } else {
                                     // Handle error
@@ -115,11 +117,16 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                             e.printStackTrace();
                         }
 
-                        // Category is not available in the JSON, so set to an empty string
-                        String category = "";
+                        // Only add the article if content was successfully fetched
+                        if (isContentFetched && content != null && !content.trim().isEmpty()) {
+                            // Category is not available in the JSON, so set to an empty string
+                            String category = "";
 
-                        Article article = new CommonArticle(title, author, category, content, link, date, description);
-                        articles.add(article);
+                            Article article = new CommonArticle(title, author, category, content, link, date, description);
+                            articles.add(article);
+                        } else {
+                            System.err.println("Skipping article due to empty content for URL: " + link);
+                        }
                     }
                     return articles;
                 } else {
@@ -133,6 +140,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
             throw new IOException("Error fetching articles: " + e.getMessage(), e);
         }
     }
+
 
     private String extractMainContent(Document doc) {
         // Remove script and style elements
