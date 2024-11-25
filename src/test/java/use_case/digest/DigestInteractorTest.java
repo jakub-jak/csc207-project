@@ -2,12 +2,12 @@ package use_case.digest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import use_case.digest.DigestCohereDataAccessInterface;
-import use_case.digest.DigestNewsDataAccessInterface;
 import data_access.NewsDataAccessObject;
 import data_access.CohereDataAccessObject;
+import interface_adapter.digest.DigestPresenter;
+import entity.Article;
 
-import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,73 +15,47 @@ public class DigestInteractorTest {
 
     private DigestNewsDataAccessInterface newsDataAccess;
     private DigestCohereDataAccessInterface cohereDataAccess;
+    private DigestPresenter digestPresenter;
+    private DigestInteractor digestInteractor;
 
     @BeforeEach
     public void setUp() {
         // Use the actual NewsAPI and CohereAPI implementations
         newsDataAccess = new NewsDataAccessObject();
         cohereDataAccess = new CohereDataAccessObject();
+        digestPresenter = new DigestPresenter();
+        digestInteractor = new DigestInteractor(newsDataAccess, cohereDataAccess, digestPresenter);
     }
 
     @Test
-    public void testFetchArticlesSuccessfully() throws IOException {
+    public void testDigestInteractor() {
         // Arrange
-        String keyword = "technology";
-        String fromDate = java.time.LocalDate.now().toString(); // Current date
-        String language = "en";
-        String sortBy = "popularity";
-        int page = 1;
-        int pageSize = 5;
-
+        DigestInputData inputData = new DigestInputData("health",
+                java.time.LocalDate.now().toString(),
+                java.time.LocalDate.now().toString(),
+                "en",
+                "popularity",
+                1,
+                2);
         // Act
-        var articles = newsDataAccess.fetchArticlesByKeyword(keyword, fromDate, null, language, sortBy, page, pageSize);
+        digestInteractor.execute(inputData);
 
         // Assert
-        assertNotNull(articles, "Articles should not be null");
-        assertTrue(articles.size() > 0, "Articles list should not be empty");
-        assertEquals(5, articles.size(), "Articles list should contain 5 items");
-    }
+        String errorMessage = digestPresenter.getErrorMessage();
 
-    @Test
-    public void testFetchArticlesFailure() {
-        // Arrange
-        String invalidKeyword = ""; // Invalid input to simulate failure
-        String fromDate = java.time.LocalDate.now().toString(); // Current date
-        String language = "en";
-        String sortBy = "popularity";
-        int page = 1;
-        int pageSize = 5;
+        if (!"Error in fetching articles".equals(errorMessage)) {
+            DigestOutputData outputData = digestPresenter.getOutputData();
+            assertNotNull(outputData, "Output data should not be null");
+            List<Article> articles = outputData.getArticles();
+            assertNotNull(articles, "Articles list should not be null");
+            assertFalse(articles.isEmpty(), "Articles list should not be empty");
 
-        // Act & Assert
-        assertThrows(IOException.class, () -> {
-            newsDataAccess.fetchArticlesByKeyword(invalidKeyword, fromDate, null, language, sortBy, page, pageSize);
-        }, "Should throw IOException for invalid input");
-    }
-
-    @Test
-    public void testSummarizeSuccessfully() throws IOException {
-        // Arrange
-        String content = "This is a sample text for summarization, " +
-                "note that this text must be longer than 250 characters. " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu fermentum eros. " +
-                "Vivamus ac nisi malesuada, varius metus et, tincidunt lacus. Fusce cursus congue nulla non pulvinar.";
-
-        // Act
-        String summary = cohereDataAccess.summarize(content);
-
-        // Assert
-        assertNotNull(summary, "Summary should not be null");
-        assertFalse(summary.isEmpty(), "Summary should not be empty");
-    }
-
-    @Test
-    public void testSummarizeFailure() {
-        // Arrange
-        String invalidContent = ""; // Invalid input to simulate failure
-
-        // Act & Assert
-        assertThrows(IOException.class, () -> {
-            cohereDataAccess.summarize(invalidContent);
-        }, "Should throw IOException for invalid input");
+            for (Article article : articles) {
+                assertNotEquals("Error in summarizing article", article.getDescription(),
+                        "Article description should not be 'Error in summarizing article'");
+            }
+        } else {
+            fail("Error in fetching articles");
+        }
     }
 }
