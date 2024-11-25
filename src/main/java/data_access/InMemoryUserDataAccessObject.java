@@ -1,20 +1,23 @@
 package data_access;
 
+import entity.Article;
 import entity.User;
 import use_case.add_category.AddCategoryDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
+import use_case.save_article.SaveArticleDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * In-memory implementation of the DAO for storing user data. This implementation does
  * NOT persist data between runs of the program.
  */
 public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface,
-        AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface {
+        AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface, SaveArticleDataAccessInterface {
 
     private String currentUserName;
     private final List<User> Users = new ArrayList<User>();
@@ -62,5 +65,17 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
     @Override
     public List<String> getUserCategories(String username) {
         return this.get(username).getCategories();
+    }
+
+    @Override
+    public void saveArticle(Article article) {
+        User currentUser = this.get(this.getCurrentUser());
+        currentUser.addArticle(article);
+    }
+
+    @Override
+    public Map<String, List<Article>> getUserArticles() {
+        User currentUser = this.get(this.getCurrentUser());
+        return currentUser.getArticles();
     }
 }
