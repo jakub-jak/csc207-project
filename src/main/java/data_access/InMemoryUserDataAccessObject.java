@@ -7,6 +7,7 @@ import use_case.login.LoginUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
 import use_case.save_article.SaveArticleDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
+import use_case.unsave_article.UnsaveArticleDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,9 @@ import java.util.Map;
  * In-memory implementation of the DAO for storing user data. This implementation does
  * NOT persist data between runs of the program.
  */
-public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface,
-        AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface, SaveArticleDataAccessInterface {
+public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface,
+        LoginUserDataAccessInterface, AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface,
+        SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface {
 
     private String currentUserName;
     private final List<User> Users = new ArrayList<User>();
@@ -71,6 +73,12 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
     public void saveArticle(Article article) {
         User currentUser = this.get(this.getCurrentUser());
         currentUser.addArticle(article);
+    }
+
+    @Override
+    public void removeArticle(Article article) {
+        User currentUser = this.get(this.getCurrentUser());
+        currentUser.deleteArticle(article);
     }
 
     @Override
