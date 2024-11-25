@@ -27,7 +27,7 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
 
     public User get() {
         for (User user : Users) {
-            if (user.getName().equals(name)) return user;
+            if (user.getName().equals(this.currentUserName)) return user;
         }
         return null;
     }

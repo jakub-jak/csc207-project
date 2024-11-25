@@ -23,6 +23,9 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterface,
@@ -32,13 +35,27 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                                                     SignupUserDataAccessInterface {
     private String currentUsername;
     private final MongoCollection<Document> userCollection;
+    private static String connectionString;
+
+    static {
+        connectionString = loadApiKey();
+    }
+
+    private static String loadApiKey() {
+        Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
+            properties.load(reader);
+            return properties.getProperty("MONGO_API_KEY");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to load API key from .env file");
+        }
+    }
 
     public MongoDBUserDataAccessObject() {
         currentUsername = "";
 
         // Connection String to connect to database
-        // TODO: retrieve connectionString from .env
-        String connectionString = "mongodb+srv://admin:AKeELr2r2MFaIYac@usercluster.jixrh.mongodb.net/?retryWrites=true&w=majority&appName=UserCluster";
 
         ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
