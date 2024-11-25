@@ -28,7 +28,7 @@ public class UnsaveArticleInteractorTest {
         // add the test article
         userRepository.saveArticle(article);
 
-        // This creates a successPresenter that test whether the test case is as we expect.
+        // This creates a successPresenter that test whether the test case is as we expect
         UnsaveArticleOutputBoundary successPresenter = new UnsaveArticleOutputBoundary() {
             @Override
             public void prepareSuccessView(UnsaveArticleOutputData outputData) {
