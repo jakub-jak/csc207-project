@@ -28,4 +28,14 @@ public class DigestPresenter implements DigestOutputBoundary {
     public String getErrorMessage() {
         return this.errorMessage;
     }
+
+    @Override
+    public void prepareSuccessView(DigestOutputData outputData) {
+
+    }
+
+    @Override
+    public void prepareFailView(String errorMessage) {
+
+    }
 }

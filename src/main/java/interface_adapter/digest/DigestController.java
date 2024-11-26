@@ -9,21 +9,15 @@ import java.time.LocalDate;
 public class DigestController {
 
     private final DigestInputBoundary digestUseCaseInteractor;
-    private final DigestOutputBoundary digestPresenter;
 
-    public DigestController(DigestInputBoundary digestUseCaseInteractor, DigestOutputBoundary digestPresenter) {
+    public DigestController(DigestInputBoundary digestUseCaseInteractor) {
         this.digestUseCaseInteractor = digestUseCaseInteractor;
-        this.digestPresenter = digestPresenter;
     }
 
     public void execute(String[] keywords, String fromDate, String toDate, String language, String sortBy) {
         final DigestInputData digestInputData = new DigestInputData(keywords, fromDate, toDate, language, sortBy);
 
         digestUseCaseInteractor.execute(digestInputData);
-
-        if (digestPresenter.getErrorMessage() != null) {
-            throw new RuntimeException("Error: " + digestPresenter.getErrorMessage());
-        }
     }
 
     public void execute(String[] keywords) {

@@ -1,6 +1,8 @@
 package app;
 
+import data_access.CohereDataAccessObject;
 import data_access.InMemoryUserDataAccessObject;
+import data_access.NewsDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginViewModel;
@@ -52,6 +54,8 @@ public class MainWithInMemory {
         final SignupViewModel signupViewModel = new SignupViewModel();
 
         final InMemoryUserDataAccessObject userDataAccessObject = new InMemoryUserDataAccessObject();
+        final NewsDataAccessObject newsDataAccessObject = new NewsDataAccessObject();
+        final CohereDataAccessObject cohereDataAccessObject = new CohereDataAccessObject();
 
         final SignupView signupView = SignupUseCaseFactory.create(viewManagerModel, loginViewModel,
                 signupViewModel, userDataAccessObject);
@@ -61,8 +65,8 @@ public class MainWithInMemory {
                 loggedInViewModel, userDataAccessObject);
         views.add(loginView, loginView.getViewName());
 
-        final LoggedInView loggedInView = LoggedinUseCasesFactory.create(viewManagerModel,
-                loggedInViewModel, loginViewModel, userDataAccessObject, userDataAccessObject);
+        final LoggedInView loggedInView = LoggedinUseCasesFactory.create(viewManagerModel, loggedInViewModel, loginViewModel,
+                userDataAccessObject, newsDataAccessObject, cohereDataAccessObject);
         views.add(loggedInView, loggedInView.getViewName());
 
         viewManagerModel.setState(signupView.getViewName());
