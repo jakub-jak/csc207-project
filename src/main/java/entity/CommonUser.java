@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,9 @@ public class CommonUser implements User {
 
     @Override
     public void addArticle(Article article) {
+        if (!articles.containsKey(article.getCategory())) {
+            articles.put(article.getCategory(), new ArrayList<Article>());
+        }
         articles.get(article.getCategory()).add(article);
     }
 
