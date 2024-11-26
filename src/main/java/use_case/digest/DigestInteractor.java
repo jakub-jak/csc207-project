@@ -20,18 +20,16 @@ public class DigestInteractor implements DigestInputBoundary{
 
     @Override
     public void execute(DigestInputData digestInputData) {
-        final String keyword = digestInputData.getKeyword();
+        final String[] keywords = digestInputData.getKeywords();
         final String fromDate = digestInputData.getFromDate();
         final String toDate =  digestInputData.getToDate();
         final String language = digestInputData.getLanguage();
         final String sortBy = digestInputData.getSortBy();
-        final int page = digestInputData.getPage();
-        final int pageSize = digestInputData.getPageSize();
 
         List<Article> articles = new ArrayList<>();
 
         try {
-            articles = digestNewsDataAccessInterface.fetchArticlesByKeyword(keyword, fromDate, toDate, language, sortBy, page, pageSize);
+            articles = digestNewsDataAccessInterface.fetchFirstMultiple(keywords, fromDate, toDate, language, sortBy);
         } catch (IOException e) {
             digestPresenter.handleError("Error in fetching articles");
             e.printStackTrace();
