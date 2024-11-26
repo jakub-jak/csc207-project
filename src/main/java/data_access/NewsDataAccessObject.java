@@ -166,4 +166,37 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
 
         return textContent;
     }
+
+    public Article fetchFirstArticle(String keyword, String fromDate, String toDate, String language, String sortBy) throws IOException {
+        int page = 1;
+        int pageSize = 10;
+        int maxPages = 5; // Define a maximum number of pages to prevent infinite loops
+
+        while (page <= maxPages) {
+            List<Article> articles = fetchArticlesByKeyword(keyword, fromDate, toDate, language, sortBy, page, pageSize);
+            if (!articles.isEmpty()) {
+                return articles.get(0);
+            } else {
+                page++;
+            }
+        }
+
+        // If no articles are found after checking the maximum number of pages
+        throw new IOException("No articles found for the given criteria.");
+    }
+
+    public List<Article> fetchFirstMultiple(String[] keywords, String fromDate, String toDate, String language, String sortBy) {
+        List<Article> articles = new ArrayList<>();
+
+        for (String keyword : keywords) {
+            try {
+                Article article = fetchFirstArticle(keyword, fromDate, toDate, language, sortBy);
+                articles.add(article);
+            } catch (IOException e) {
+                System.err.println("No articles found for keyword: " + keyword);
+            }
+        }
+
+        return articles;
+    }
 }
