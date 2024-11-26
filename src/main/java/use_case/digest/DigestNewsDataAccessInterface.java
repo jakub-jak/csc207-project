@@ -14,4 +14,8 @@ public interface DigestNewsDataAccessInterface {
                                          String sortBy,
                                          int page,
                                          int pageSize) throws IOException;
+
+    Article fetchFirstArticle(String keyword, String fromDate, String toDate, String language, String sortBy) throws IOException;
+
+    List<Article> fetchFirstMultiple(String[] keywords, String fromDate, String toDate, String language, String sortBy) throws IOException;
 }
