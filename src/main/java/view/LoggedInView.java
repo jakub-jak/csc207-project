@@ -60,7 +60,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         JButton addCategoryButton = new JButton("Add Category");
         addCategoryButton.addActionListener(e -> {
             String category = categoryField.getText();  // Get the category name from the text field
-            this.addCategoryController.execute(initalState.getUsername(), category); // Execute AddCategory use case
+            this.addCategoryController.execute(category); // Execute AddCategory use case
             categoryField.setText(""); // Clear the text field after adding the category
         });
 
@@ -73,7 +73,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         categoryButtonsPanel.setLayout(new FlowLayout());
         // Populate the categoryButtonsPanel with the saved categories of the current user
         for (String category: initalState.getCategoriesList()){
-            JButton categoryButton = createCategoryButton(initalState.getUsername(), category);
+            JButton categoryButton = createCategoryButton(category);
             categoryButtonsPanel.add(categoryButton);
         }
         categoryButtonsPanel.revalidate();    // Revalidate the layout
@@ -101,9 +101,8 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         if (evt.getPropertyName().startsWith("add category: ")){
             final LoggedInState state = (LoggedInState) evt.getNewValue();
-            String user = state.getUsername();
             String category = evt.getPropertyName().substring("add category: ".length());
-            JButton categoryButton = createCategoryButton(user, category);
+            JButton categoryButton = createCategoryButton(category);
             categoryButtonsPanel.add(categoryButton);
             categoryButtonsPanel.revalidate();    // Revalidate the layout
             categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
@@ -152,11 +151,11 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         return viewName;
     }
 
-    private JButton createCategoryButton(String user, String category) {
+    private JButton createCategoryButton(String category) {
         JButton categoryButton = new JButton(category);
         categoryButton.addActionListener(e -> {
             // execute remove category use case
-            this.removeCategoryController.execute(user, category);
+            this.removeCategoryController.execute(category);
 
             // Remove this button from the panel
             categoryButtonsPanel.remove(categoryButton);

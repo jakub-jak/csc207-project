@@ -16,11 +16,12 @@ public class AddCategoryInteractorTest {
 
     @Test
     public void testAddCategory() {
-        AddCategoryInputData inputData = new AddCategoryInputData("Paul", "Horror");
+        AddCategoryInputData inputData = new AddCategoryInputData("Horror");
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
+        userRepository.setCurrentUser("Paul");
 
         // This creates a successPresenter that test whether the test case is as we expect.
         AddCategoryOutputBoundary successPresenter = new AddCategoryOutputBoundary() {
@@ -41,13 +42,14 @@ public class AddCategoryInteractorTest {
 
     @Test
     public void failureCategoryAlreadyExists() {
-        AddCategoryInputData inputData = new AddCategoryInputData("Paul", "Horror");
+        AddCategoryInputData inputData = new AddCategoryInputData("Horror");
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
+        userRepository.setCurrentUser("Paul");
         // add the test category
-        userRepository.saveAddedCategory("Paul", "Horror");
+        userRepository.saveCategory("Horror");
 
         // This creates a successPresenter that test whether the test case is as we expect.
         AddCategoryOutputBoundary successPresenter = new AddCategoryOutputBoundary() {
@@ -68,11 +70,12 @@ public class AddCategoryInteractorTest {
 
     @Test
     public void failureEmptyCategory() {
-        AddCategoryInputData inputData = new AddCategoryInputData("Paul", "");
+        AddCategoryInputData inputData = new AddCategoryInputData("");
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
+        userRepository.setCurrentUser("Paul");
 
         // This creates a successPresenter that test whether the test case is as we expect.
         AddCategoryOutputBoundary successPresenter = new AddCategoryOutputBoundary() {

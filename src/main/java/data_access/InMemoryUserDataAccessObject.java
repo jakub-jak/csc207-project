@@ -55,18 +55,21 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
     }
 
     @Override
-    public void saveAddedCategory(String username, String category) {
-        this.get(username).addCategory(category);
+    public void saveCategory(String category) {
+        User currentUser = this.get(this.getCurrentUser());
+        currentUser.addCategory(category);
     }
 
     @Override
-    public void saveRemovedCategory(String username, String category) {
-        this.get(username).deleteCategory(category);
+    public void removeCategory(String category) {
+        User currentUser = this.get(this.getCurrentUser());
+        currentUser.deleteCategory(category);
     }
 
     @Override
-    public List<String> getUserCategories(String username) {
-        return this.get(username).getCategories();
+    public List<String> getUserCategories() {
+        User currentUser = this.get(this.getCurrentUser());
+        return currentUser.getCategories();
     }
 
     @Override

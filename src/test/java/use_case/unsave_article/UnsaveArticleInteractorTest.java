@@ -16,7 +16,7 @@ public class UnsaveArticleInteractorTest {
 
     @Test
     public void testUnsaveArticle() {
-        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d");
+        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d", "a");
         UnsaveArticleInputData inputData = new UnsaveArticleInputData(article);
 
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
@@ -48,7 +48,7 @@ public class UnsaveArticleInteractorTest {
 
     @Test
     public void failureArticleNotSaved() {
-        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d");
+        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d", "a");
         UnsaveArticleInputData inputData = new UnsaveArticleInputData(article);
 
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();

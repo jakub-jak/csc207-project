@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 public class SaveArticleInteractorTest {
     @Test
     public void testSaveArticle() {
-        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d");
+        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d", "a");
         SaveArticleInputData inputData = new SaveArticleInputData(article);
 
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
@@ -44,7 +44,7 @@ public class SaveArticleInteractorTest {
 
     @Test
     public void failureArticleAlreadySaved() {
-        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d");
+        Article article = new CommonArticle("t", "au", "horror", "con", "li", "d", "a");
         SaveArticleInputData inputData = new SaveArticleInputData(article);
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
