@@ -28,15 +28,13 @@ public class DigestInteractorTest {
     }
 
     @Test
-    public void testDigestInteractor() {
+    public void testDigestInteractorSuccess() {
         // Arrange
-        DigestInputData inputData = new DigestInputData("toy",
-                java.time.LocalDate.now().toString(),
+        DigestInputData inputData = new DigestInputData(new String[]{"technology", "health"},
+                java.time.LocalDate.now().minusDays(1).toString(),
                 java.time.LocalDate.now().toString(),
                 "en",
-                "popularity",
-                1,
-                2);
+                "popularity");
         // Act
         digestInteractor.execute(inputData);
 
