@@ -6,6 +6,7 @@ import entity.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +40,7 @@ public class SignupInteractor implements SignupInputBoundary {
             userPresenter.prepareFailView("Passwords don't match.");
         }
         else {
-            final User user = new CommonUser(signupInputData.getUsername(), signupInputData.getPassword(), new ArrayList<>(), Collections.emptyMap());
+            final User user = new CommonUser(signupInputData.getUsername(), signupInputData.getPassword(), new ArrayList<>(), new HashMap<>());
             userDataAccessObject.save(user);
 
             final SignupOutputData signupOutputData = new SignupOutputData(user.getName(), false);

@@ -46,5 +46,6 @@ public class DigestInteractor implements DigestInputBoundary{
 
         final DigestOutputData digestOutputData = new DigestOutputData(articles);
         digestPresenter.processOutput(digestOutputData);
+        digestPresenter.prepareSuccessView(digestOutputData);
     }
 }

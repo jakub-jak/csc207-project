@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 /**
  * The View for when the user is logged into the program.
@@ -96,11 +97,15 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         // Article Panel
         articlePanel = new JPanel();
+        articlePanel.setLayout(new BoxLayout(articlePanel, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollArticlePanel = new JScrollPane(articlePanel);  // Wrap the articlePanel in a JScrollPane to make it scrollable
+        scrollArticlePanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(navigationPanel);
         this.add(categoryPanel);
-        this.add(articlePanel);
+        this.add(scrollArticlePanel);
     }
 
     @Override
@@ -115,35 +120,76 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         }
 
         // Populate the articlePanel with articles for each article the user generates.
-        if (evt.getPropertyName().startsWith("articles")) {
+        if (evt.getPropertyName().equals("articles")) {
             final LoggedInState state = (LoggedInState) evt.getNewValue();
-            articlePanel.removeAll();
-
-            for (Article article: state.getArticleList()){
-                JPanel articleSlide = new JPanel();
-                JLabel articleTitle = new JLabel(article.getTitle());
-                JLabel articleAuthor = new JLabel(article.getAuthor());
-                JLabel articleDate = new JLabel(article.getDate());
-                JLabel articleLink = new JLabel(article.getLink());
-                JLabel articleDescription = new JLabel(article.getDescription());
-
-                JButton saveButton = createSaveButton(article);
-                JButton unsaveButton = createUnsaveButton(article);
-
-                articleSlide.add(articleTitle);
-                articleSlide.add(articleAuthor);
-                articleSlide.add(articleDate);
-                articleSlide.add(articleLink);
-                articleSlide.add(articleDescription);
-                articleSlide.add(saveButton);
-                articleSlide.add(unsaveButton);
-                articlePanel.add(articleSlide);
-            }
+            refreshArticlePanel(state);
         }
     }
 
     public String getViewName() {
         return viewName;
+    }
+
+    // refresh the article panel to show new articles generated, following the digest use case
+    private void refreshArticlePanel(LoggedInState state) {
+        articlePanel.removeAll();
+
+        for (Article article: state.getArticleList()){
+            JPanel articleSlide = new JPanel();
+            articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS)); // Stack components vertically
+
+            // Title
+            JLabel articleTitle = new JLabel(article.getTitle());
+            articleTitle.setFont(new Font("Arial", Font.BOLD, 14));
+
+            // Author
+            JLabel articleAuthor = new JLabel(article.getAuthor());
+            articleAuthor.setFont(new Font("Arial", Font.PLAIN, 12));
+
+            // Date
+            JLabel articleDate = new JLabel(article.getDate());
+            articleDate.setFont(new Font("Arial", Font.PLAIN, 12));
+
+            // Link
+            JLabel articleLink = new JLabel(article.getLink());
+            articleLink.setFont(new Font("Arial", Font.PLAIN, 12));
+            articleLink.setForeground(Color.BLUE);
+
+            // Description
+            JTextArea articleDescription = new JTextArea(article.getDescription());
+            articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
+            articleDescription.setLineWrap(true);
+            articleDescription.setWrapStyleWord(true);
+            articleDescription.setEditable(false); // Disable editing
+            articleDescription.setBackground(articleSlide.getBackground()); // Make the background same as articleSlide
+
+            // Calculate max width of the description as half of the window size
+            int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2; // Get half the screen width
+            articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
+            JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
+
+            // save / un-save buttons
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.add(createSaveButton(article));
+            buttonPanel.add(createUnsaveButton(article));
+
+            // Add labels to article slide panel
+            articleSlide.add(articleTitle);
+            articleSlide.add(articleAuthor);
+            articleSlide.add(articleDate);
+            articleSlide.add(articleLink);
+            articleSlide.add(descriptionScrollPane); // Scrollable description
+            articleSlide.add(buttonPanel);
+
+
+            // Add a divider (separator) after each article
+            JSeparator separator = new JSeparator();
+            articlePanel.add(articleSlide);
+            articlePanel.add(separator);
+
+            articlePanel.revalidate();    // Revalidate the layout
+            articlePanel.repaint();       // Repaint the panel to reflect the changes
+        }
     }
 
     private JButton createCategoryButton(String category) {
@@ -166,9 +212,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         generateButton.addActionListener(e -> {
             // execute digest use case
             this.digestController.execute(loggedInViewModel.getState().getCategoriesList().toArray(new String[0]));
-
-            generateButton.setBackground(Color.BLUE);
-
         });
         return generateButton;
     }
@@ -178,8 +221,10 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         saveButton.setBackground(Color.GREEN);
 
         saveButton.addActionListener(e -> {
-            // execute digest use case
+            // execute save article use case
             this.saveArticleController.execute(article);
+            articlePanel.revalidate();    // Revalidate the layout
+            articlePanel.repaint();       // Repaint the panel to reflect the changes
         });
         return saveButton;
     }
@@ -189,8 +234,10 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         unsaveButton.setBackground(Color.RED);
 
         unsaveButton.addActionListener(e -> {
-            // execute digest use case
+            // execute unsave article use case
             this.unsaveArticleController.execute(article);
+            articlePanel.revalidate();    // Revalidate the layout
+            articlePanel.repaint();       // Repaint the panel to reflect the changes
         });
         return unsaveButton;
     }

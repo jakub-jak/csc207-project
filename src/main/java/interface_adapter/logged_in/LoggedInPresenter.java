@@ -84,15 +84,11 @@ public class LoggedInPresenter implements LogoutOutputBoundary, AddCategoryOutpu
 
     @Override
     public void prepareSuccessView(SaveArticleOutputData response) {
-        final LoggedInState loggedInState = loggedInViewModel.getState();
-        loggedInState.getArticleList().add(response.getArticle());
         loggedInViewModel.firePropertyChanged("articles add");
     }
 
     @Override
     public void prepareSuccessView(UnsaveArticleOutputData response) {
-        final LoggedInState loggedInState = loggedInViewModel.getState();
-        loggedInState.getArticleList().remove(response.getArticle());
         loggedInViewModel.firePropertyChanged("articles remove");
     }
 
