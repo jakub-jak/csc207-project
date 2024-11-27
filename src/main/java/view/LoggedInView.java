@@ -1,16 +1,16 @@
 package view;
 
 import entity.Article;
-import interface_adapter.logged_in.AddCategoryController;
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.logged_in.RemoveCategoryController;
+import entity.CommonArticle;
+import interface_adapter.digest.DigestController;
+import interface_adapter.logged_in.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 /**
  * The View for when the user is logged into the program.
@@ -24,10 +24,16 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     private final AddCategoryController addCategoryController;
     private final RemoveCategoryController removeCategoryController;
+    private final DigestController digestController;
+    private final SaveArticleController saveArticleController;
+    private final UnsaveArticleController unsaveArticleController;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel,
                         AddCategoryController addCategoryController,
-                        RemoveCategoryController removeCategoryController) {
+                        RemoveCategoryController removeCategoryController,
+                        DigestController digestController,
+                        SaveArticleController saveArticleController,
+                        UnsaveArticleController unsaveArticleController) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
@@ -36,6 +42,9 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         this.addCategoryController = addCategoryController;
         this.removeCategoryController = removeCategoryController;
+        this.digestController = digestController;
+        this.saveArticleController = saveArticleController;
+        this.unsaveArticleController = unsaveArticleController;
 
         // Navbar Panel
         JPanel navigationPanel = new JPanel();
@@ -60,7 +69,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         JButton addCategoryButton = new JButton("Add Category");
         addCategoryButton.addActionListener(e -> {
             String category = categoryField.getText();  // Get the category name from the text field
-            this.addCategoryController.execute(initalState.getUsername(), category); // Execute AddCategory use case
+            this.addCategoryController.execute(category); // Execute AddCategory use case
             categoryField.setText(""); // Clear the text field after adding the category
         });
 
@@ -73,14 +82,13 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         categoryButtonsPanel.setLayout(new FlowLayout());
         // Populate the categoryButtonsPanel with the saved categories of the current user
         for (String category: initalState.getCategoriesList()){
-            JButton categoryButton = createCategoryButton(initalState.getUsername(), category);
+            JButton categoryButton = createCategoryButton(category);
             categoryButtonsPanel.add(categoryButton);
         }
         categoryButtonsPanel.revalidate();    // Revalidate the layout
         categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
 
-        // TODO add method for handling pressing the generate button
-        JButton generateButton = new JButton("Generate");
+        JButton generateButton = createGenerateButton();
 
         // inputPanel.add(generateButton);  // consider putting this in the input panel
         categoryPanel.add(inputPanel);
@@ -89,62 +97,32 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         // Article Panel
         articlePanel = new JPanel();
+        articlePanel.setLayout(new BoxLayout(articlePanel, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollArticlePanel = new JScrollPane(articlePanel);  // Wrap the articlePanel in a JScrollPane to make it scrollable
+        scrollArticlePanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(navigationPanel);
         this.add(categoryPanel);
-        this.add(articlePanel);
+        this.add(scrollArticlePanel);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
         if (evt.getPropertyName().startsWith("add category: ")){
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            String user = state.getUsername();
             String category = evt.getPropertyName().substring("add category: ".length());
-            JButton categoryButton = createCategoryButton(user, category);
+            JButton categoryButton = createCategoryButton(category);
             categoryButtonsPanel.add(categoryButton);
             categoryButtonsPanel.revalidate();    // Revalidate the layout
             categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
         }
 
-        // TODO add propertyChangeEvent for category
-        // Populate the categoryPanel with buttons for each category that the user has.
-//        if (evt.getPropertyName().contains("category")) {
-//            final LoggedInState state = (LoggedInState) evt.getNewValue();
-//            String user = state.getUsername();
-//
-//            categoryButtonsPanel.removeAll();
-//            for (String category: state.getCategoriesList()){
-//                JButton categoryButton = createCategoryButton(user, category);
-//                categoryButtonsPanel.add(categoryButton);
-//            }
-//        }
-
-        // TODO add propertyChangeEvent for articles
         // Populate the articlePanel with articles for each article the user generates.
         if (evt.getPropertyName().equals("articles")) {
             final LoggedInState state = (LoggedInState) evt.getNewValue();
-            articlePanel.removeAll();
-            for (Article article: state.getArticleList()){
-                JPanel articleSlide = new JPanel();
-                JLabel articleTitle = new JLabel(article.getTitle());
-                JLabel articleAuthor = new JLabel(article.getAuthor());
-                JLabel articleDate = new JLabel(article.getDate());
-                JLabel articleLink = new JLabel(article.getLink());
-                JLabel articleDescription = new JLabel(article.getDescription());
-                JButton saveButton = new JButton("Save");
-                // TODO add actionListener to save button that saves it to the user DB when it is pressed
-                saveButton.addActionListener(e -> {});
-                articleSlide.add(articleTitle);
-                articleSlide.add(articleAuthor);
-                articleSlide.add(articleDate);
-                articleSlide.add(articleLink);
-                articleSlide.add(articleDescription);
-                articleSlide.add(saveButton);
-                articlePanel.add(articleSlide);
-            }
+            refreshArticlePanel(state);
         }
     }
 
@@ -152,11 +130,73 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         return viewName;
     }
 
-    private JButton createCategoryButton(String user, String category) {
+    // refresh the article panel to show new articles generated, following the digest use case
+    private void refreshArticlePanel(LoggedInState state) {
+        articlePanel.removeAll();
+
+        for (Article article: state.getArticleList()){
+            JPanel articleSlide = new JPanel();
+            articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS)); // Stack components vertically
+
+            // Title
+            JLabel articleTitle = new JLabel(article.getTitle());
+            articleTitle.setFont(new Font("Arial", Font.BOLD, 14));
+
+            // Author
+            JLabel articleAuthor = new JLabel(article.getAuthor());
+            articleAuthor.setFont(new Font("Arial", Font.PLAIN, 12));
+
+            // Date
+            JLabel articleDate = new JLabel(article.getDate());
+            articleDate.setFont(new Font("Arial", Font.PLAIN, 12));
+
+            // Link
+            JLabel articleLink = new JLabel(article.getLink());
+            articleLink.setFont(new Font("Arial", Font.PLAIN, 12));
+            articleLink.setForeground(Color.BLUE);
+
+            // Description
+            JTextArea articleDescription = new JTextArea(article.getDescription());
+            articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
+            articleDescription.setLineWrap(true);
+            articleDescription.setWrapStyleWord(true);
+            articleDescription.setEditable(false); // Disable editing
+            articleDescription.setBackground(articleSlide.getBackground()); // Make the background same as articleSlide
+
+            // Calculate max width of the description as half of the window size
+            int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2; // Get half the screen width
+            articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
+            JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
+
+            // save / un-save buttons
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.add(createSaveButton(article));
+            buttonPanel.add(createUnsaveButton(article));
+
+            // Add labels to article slide panel
+            articleSlide.add(articleTitle);
+            articleSlide.add(articleAuthor);
+            articleSlide.add(articleDate);
+            articleSlide.add(articleLink);
+            articleSlide.add(descriptionScrollPane); // Scrollable description
+            articleSlide.add(buttonPanel);
+
+
+            // Add a divider (separator) after each article
+            JSeparator separator = new JSeparator();
+            articlePanel.add(articleSlide);
+            articlePanel.add(separator);
+
+            articlePanel.revalidate();    // Revalidate the layout
+            articlePanel.repaint();       // Repaint the panel to reflect the changes
+        }
+    }
+
+    private JButton createCategoryButton(String category) {
         JButton categoryButton = new JButton(category);
         categoryButton.addActionListener(e -> {
             // execute remove category use case
-            this.removeCategoryController.execute(user, category);
+            this.removeCategoryController.execute(category);
 
             // Remove this button from the panel
             categoryButtonsPanel.remove(categoryButton);
@@ -164,5 +204,41 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
         });
         return categoryButton;
+    }
+
+    private JButton createGenerateButton() {
+        JButton generateButton = new JButton("Generate");
+        generateButton.setBackground(Color.GREEN);
+        generateButton.addActionListener(e -> {
+            // execute digest use case
+            this.digestController.execute(loggedInViewModel.getState().getCategoriesList().toArray(new String[0]));
+        });
+        return generateButton;
+    }
+
+    private JButton createSaveButton(Article article) {
+        JButton saveButton = new JButton("Save");
+        saveButton.setBackground(Color.GREEN);
+
+        saveButton.addActionListener(e -> {
+            // execute save article use case
+            this.saveArticleController.execute(article);
+            articlePanel.revalidate();    // Revalidate the layout
+            articlePanel.repaint();       // Repaint the panel to reflect the changes
+        });
+        return saveButton;
+    }
+
+    private JButton createUnsaveButton(Article article) {
+        JButton unsaveButton = new JButton("Unsave");
+        unsaveButton.setBackground(Color.RED);
+
+        unsaveButton.addActionListener(e -> {
+            // execute unsave article use case
+            this.unsaveArticleController.execute(article);
+            articlePanel.revalidate();    // Revalidate the layout
+            articlePanel.repaint();       // Repaint the panel to reflect the changes
+        });
+        return unsaveButton;
     }
 }

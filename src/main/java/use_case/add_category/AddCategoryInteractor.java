@@ -21,18 +21,17 @@ public class AddCategoryInteractor implements AddCategoryInputBoundary {
 
     @Override
     public void execute(AddCategoryInputData addCategoryInputData) {
-        final String username = addCategoryInputData.getUsername();
         final String inputCategory = addCategoryInputData.getCategory();
-        final List<String> categories = addCategoryDataAccessObject.getUserCategories(username);
+        final List<String> categories = addCategoryDataAccessObject.getUserCategories();
 
         if (categories.contains(inputCategory)) {
             addCategoryPresenter.prepareFailView("Category already exists.");
         } else if (inputCategory.isEmpty()) {
             addCategoryPresenter.prepareFailView("Please enter a valid category.");
         } else {
-            addCategoryDataAccessObject.saveAddedCategory(username, inputCategory);
+            addCategoryDataAccessObject.saveCategory(inputCategory);
             final AddCategoryOutputData addCategoryOutputData =
-                    new AddCategoryOutputData(username, inputCategory, false);
+                    new AddCategoryOutputData(inputCategory, false);
             addCategoryPresenter.prepareSuccessView(addCategoryOutputData);
         }
     }

@@ -16,13 +16,14 @@ import static org.junit.Assert.*;
 public class RemoveCategoryInteractorTest {
     @Test
     public void testRemoveCategory() {
-        RemoveCategoryInputData inputData = new RemoveCategoryInputData("Paul", "Horror");
+        RemoveCategoryInputData inputData = new RemoveCategoryInputData("Horror");
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
+        userRepository.setCurrentUser("Paul");
         // add the desired category to remove
-        userRepository.saveAddedCategory("Paul", "Horror");
+        userRepository.saveCategory("Horror");
 
         // This creates a successPresenter that test whether the test case is as we expect.
         RemoveCategoryOutputBoundary successPresenter = new RemoveCategoryOutputBoundary() {
@@ -44,13 +45,14 @@ public class RemoveCategoryInteractorTest {
     // This case is not expected to arise in our program
     @Test
     public void failCategoryDoesNotExist() {
-        RemoveCategoryInputData inputData = new RemoveCategoryInputData("Paul", "Horror");
+        RemoveCategoryInputData inputData = new RemoveCategoryInputData("Horror");
         InMemoryUserDataAccessObject userRepository = new InMemoryUserDataAccessObject();
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
+        userRepository.setCurrentUser("Paul");
         // add some random category
-        userRepository.saveAddedCategory("Paul", "Mystery");
+        userRepository.saveCategory("Mystery");
 
         // This creates a successPresenter that test whether the test case is as we expect.
         RemoveCategoryOutputBoundary successPresenter = new RemoveCategoryOutputBoundary() {
