@@ -168,10 +168,11 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
             JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
 
-            // save / un-save buttons
+            // save / un-save / share buttons
             JPanel buttonPanel = new JPanel();
             buttonPanel.add(createSaveButton(article));
             buttonPanel.add(createUnsaveButton(article));
+            buttonPanel.add(createShareButton(article));
 
             // Add labels to article slide panel
             articleSlide.add(articleTitle);
@@ -241,4 +242,24 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         });
         return unsaveButton;
     }
+
+    private JButton createShareButton(Article article) {
+        JButton shareButton = new JButton("Share to my email");
+        shareButton.setBackground(Color.BLUE);
+
+        shareButton.addActionListener(e -> {
+            // execute share article use case
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Sharing article: " + article.getTitle(),
+                    "Share",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            // When I have a shareArticleController, replace the above line with:
+            // this.shareArticleController.execute(article);
+        });
+        return shareButton;
+    }
+
+
 }
