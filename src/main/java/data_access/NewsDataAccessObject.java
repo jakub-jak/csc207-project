@@ -6,6 +6,11 @@ import entity.CommonArticle;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+import use_case.digest.DigestNewsDataAccessInterface;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,7 +23,7 @@ import java.util.Properties;
 /**
  * The DAO for news data using OkHttp.
  */
-public class NewsDataAccessObject {
+public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
     // Constants
     private static final String BASE_URL = "https://newsapi.org/v2/";
     private static final String API_KEY;
@@ -75,19 +80,53 @@ public class NewsDataAccessObject {
                                 ? articleObject.get("title").getAsString() : "";
                         String author = articleObject.has("author") && !articleObject.get("author").isJsonNull()
                                 ? articleObject.get("author").getAsString() : "";
-                        String content = articleObject.has("content") && !articleObject.get("content").isJsonNull()
-                                ? articleObject.get("content").getAsString() : "";
                         String link = articleObject.has("url") && !articleObject.get("url").isJsonNull()
                                 ? articleObject.get("url").getAsString() : "";
                         String date = articleObject.has("publishedAt") && !articleObject.get("publishedAt").isJsonNull()
                                 ? articleObject.get("publishedAt").getAsString() : "";
-                        String description = articleObject.has("description") && !articleObject.get("description").isJsonNull()
-                                ? articleObject.get("description").getAsString() : "";
-                        // Category is not available in the JSON, so set to an empty string
-                        String category = "";
+                        String description = "";
 
-                        Article article = new CommonArticle(title, author, category, content, link, date);
-                        articles.add(article);
+                        // Fetch the article content from the URL
+                        String content = "";
+                        boolean isContentFetched = false;
+                        try {
+                            // Fetch the HTML content of the article URL
+                            Request articleRequest = new Request.Builder()
+                                    .url(link)
+                                    .addHeader("User-Agent", "Mozilla/5.0")
+                                    .build();
+
+                            try (Response articleResponse = client.newCall(articleRequest).execute()) {
+                                if (articleResponse.isSuccessful() && articleResponse.body() != null) {
+                                    String htmlContent = articleResponse.body().string();
+
+                                    // Parse the HTML content using jsoup
+                                    Document doc = Jsoup.parse(htmlContent, link);
+
+                                    // Attempt to extract the main content
+                                    content = extractMainContent(doc);
+                                    isContentFetched = true;
+
+                                } else {
+                                    // Handle error
+                                    System.err.println("Failed to fetch article content for URL: " + link);
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error fetching article content for URL: " + link);
+                            e.printStackTrace();
+                        }
+
+                        // Only add the article if content was successfully fetched
+                        if (isContentFetched && content != null && !content.trim().isEmpty()) {
+                            // Category is not available in the JSON, so set to an empty string
+                            String category = "";
+
+                            Article article = new CommonArticle(title, author, category, content, link, date, description);
+                            articles.add(article);
+                        } else {
+                            System.err.println("Skipping article due to empty content for URL: " + link);
+                        }
                     }
                     return articles;
                 } else {
@@ -100,5 +139,64 @@ public class NewsDataAccessObject {
         } catch (Exception e) {
             throw new IOException("Error fetching articles: " + e.getMessage(), e);
         }
+    }
+
+
+    private String extractMainContent(Document doc) {
+        // Remove script and style elements
+        doc.select("script, style, noscript").remove();
+
+        // Attempt to select common content containers
+        Elements articleElements = doc.select("article");
+        if (articleElements.isEmpty()) {
+            // Fallback to selecting main content area
+            articleElements = doc.select("main");
+        }
+        if (articleElements.isEmpty()) {
+            // Fallback to selecting content based on common CSS classes
+            articleElements = doc.select("[class*=content], [class*=article], [id*=content], [id*=article]");
+        }
+
+        String textContent = articleElements.text();
+
+        // If still empty, fallback to body text
+        if (textContent.isEmpty()) {
+            textContent = doc.body().text();
+        }
+
+        return textContent;
+    }
+
+    public Article fetchFirstArticle(String keyword, String fromDate, String toDate, String language, String sortBy) throws IOException {
+        int page = 1;
+        int pageSize = 10;
+        int maxPages = 5; // Define a maximum number of pages to prevent infinite loops
+
+        while (page <= maxPages) {
+            List<Article> articles = fetchArticlesByKeyword(keyword, fromDate, toDate, language, sortBy, page, pageSize);
+            if (!articles.isEmpty()) {
+                return articles.get(0);
+            } else {
+                page++;
+            }
+        }
+
+        // If no articles are found after checking the maximum number of pages
+        throw new IOException("No articles found for the given criteria.");
+    }
+
+    public List<Article> fetchFirstMultiple(String[] keywords, String fromDate, String toDate, String language, String sortBy) {
+        List<Article> articles = new ArrayList<>();
+
+        for (String keyword : keywords) {
+            try {
+                Article article = fetchFirstArticle(keyword, fromDate, toDate, language, sortBy);
+                articles.add(article);
+            } catch (IOException e) {
+                System.err.println("No articles found for keyword: " + keyword);
+            }
+        }
+
+        return articles;
     }
 }

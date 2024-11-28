@@ -2,6 +2,9 @@ package use_case.login;
 
 import entity.User;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * The Login Interactor.
  */
@@ -19,6 +22,12 @@ public class LoginInteractor implements LoginInputBoundary {
     public void execute(LoginInputData loginInputData) {
         final String username = loginInputData.getUsername();
         final String password = loginInputData.getPassword();
+        Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+        Matcher m = p.matcher(username);
+        boolean matchFound = m.matches();
+        if (!matchFound) {
+            loginPresenter.prepareFailView("This has to be a valid email address.");
+        }
         if (!userDataAccessObject.existsByName(username)) {
             loginPresenter.prepareFailView(username + ": Account does not exist.");
         }

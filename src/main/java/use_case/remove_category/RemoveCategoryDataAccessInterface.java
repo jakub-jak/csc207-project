@@ -4,16 +4,14 @@ import java.util.List;
 
 public interface RemoveCategoryDataAccessInterface {
     /**
-     * Saves the category to the user's categories.
-     *
+     * Saves the category to the current user's categories.
      * @param category the category to save
      */
-    void saveCategory(String category);
+    void removeCategory(String category);
 
     /**
-     * Gets the given user's category list.
-     *
-     * @return the given user's category list.
+     * Gets the current user's category list.
+     * @return the current user's category list.
      */
     List<String> getUserCategories();
 }

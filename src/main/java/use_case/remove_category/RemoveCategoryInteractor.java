@@ -17,7 +17,6 @@ public class RemoveCategoryInteractor implements RemoveCategoryInputBoundary  {
 
     @Override
     public void execute(RemoveCategoryInputData removeCategoryInputData) {
-        final String username = removeCategoryInputData.getUsername();
         final String inputCategory = removeCategoryInputData.getCategory();
         final List<String> categories = removecategoryDataAccessObject.getUserCategories();
 
@@ -25,8 +24,9 @@ public class RemoveCategoryInteractor implements RemoveCategoryInputBoundary  {
             removeCategoryPresenter.prepareFailView("Category does not exist.");
         }
         else {
+            removecategoryDataAccessObject.removeCategory(inputCategory);
             final RemoveCategoryOutputData removeCategoryOutputData =
-                    new RemoveCategoryOutputData(username, inputCategory, false);
+                    new RemoveCategoryOutputData(inputCategory, false);
             removeCategoryPresenter.prepareSuccessView(removeCategoryOutputData);
         }
     }
