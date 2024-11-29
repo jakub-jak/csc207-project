@@ -253,7 +253,22 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         shareButton.addActionListener(e -> {
             try {
                 this.shareArticleController.execute(article);
+                // Show a success popup message
+                JOptionPane.showMessageDialog(
+                        null,
+                        "The article has been sent to your email! Please check your inbox.",
+                        "Email Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
             } catch (Exception ex) {
+                // Show an error popup message in case of an exception
+                JOptionPane.showMessageDialog(
+                        null,
+                        "An error occurred while sending the email. Please try again. " +
+                                "You might want to check if the email address you signed-up with is a valid one.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
                 throw new RuntimeException(ex);
             }
         });
