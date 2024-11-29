@@ -1,11 +1,7 @@
 package view;
 
-
 import entity.Article;
-import interface_adapter.digest.DigestController;
-import interface_adapter.logged_in.*;
-import interface_adapter.saved_articles.SavedArticlesState;
-import interface_adapter.saved_articles.SavedArticlesViewModel;
+import interface_adapter.saved_articles.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,14 +18,14 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
 
     private final AddCategoryController addCategoryController;
     private final RemoveCategoryController removeCategoryController;
-    private final SaveArticleController saveArticleController;
     private final UnsaveArticleController unsaveArticleController;
+    private final NewsController newsController;
 
     public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel,
                              AddCategoryController addCategoryController,
                              RemoveCategoryController removeCategoryController,
-                             SaveArticleController saveArticleController,
-                             UnsaveArticleController unsaveArticleController) {
+                             UnsaveArticleController unsaveArticleController,
+                             NewsController newsController) {
         this.savedArticlesViewModel = savedArticlesViewModel;
         this.savedArticlesViewModel.addPropertyChangeListener(this);
 
@@ -37,14 +33,15 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
 
         this.addCategoryController = addCategoryController;
         this.removeCategoryController = removeCategoryController;
-        this.saveArticleController = saveArticleController;
         this.unsaveArticleController = unsaveArticleController;
+        this.newsController = newsController;
 
         // Navbar Panel
         JPanel navigationPanel = new JPanel();
         JButton newsButton = new JButton("News");
-        // TODO: implement the actionListener to go to the logged in view
-        newsButton.addActionListener(this);
+        newsButton.addActionListener(e -> {
+            this.newsController.execute();
+        });
         JLabel savedArticlesTitleLabel = new JLabel("Saved Articles");
         // TODO: add action listener to go to the login view
         JButton LogoutButton = new JButton("Log out");
@@ -90,12 +87,20 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
     private JButton createCategoryButton(String category) {
         JButton categoryButton = new JButton(category);
         // TODO: add actionListener for removing a category filter
-        categoryButton.addActionListener(this);
+        categoryButton.addActionListener(e -> {
+            // execute remove category use case
+            this.removeCategoryController.execute(category);
+
+            // Remove this button from the panel
+            filterPanel.remove(categoryButton);
+            filterPanel.revalidate();    // Revalidate the layout
+            filterPanel.repaint();       // Repaint the panel to reflect the changes
+        });
         return categoryButton;
     }
 
     // refresh the article panel to show new articles generated, following the digest use case
-    private void refreshArticlePanel(LoggedInState state) {
+    private void refreshArticlePanel(SavedArticlesState state) {
         articlesPanel.removeAll();
 
         for (Article article: state.getArticleList()){
@@ -132,9 +137,8 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
             articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
             JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
 
-            // save / un-save / share buttons
+            // un-save / share buttons
             JPanel buttonPanel = new JPanel();
-            buttonPanel.add(createSaveButton(article));
             buttonPanel.add(createUnsaveButton(article));
             buttonPanel.add(createShareButton(article));
 
@@ -155,19 +159,6 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
             articlesPanel.revalidate();    // Revalidate the layout
             articlesPanel.repaint();       // Repaint the panel to reflect the changes
         }
-    }
-
-    private JButton createSaveButton(Article article) {
-        JButton saveButton = new JButton("Save");
-        saveButton.setBackground(Color.GREEN);
-
-        saveButton.addActionListener(e -> {
-            // execute save article use case
-            this.saveArticleController.execute(article);
-            articlesPanel.revalidate();    // Revalidate the layout
-            articlesPanel.repaint();       // Repaint the panel to reflect the changes
-        });
-        return saveButton;
     }
 
     private JButton createUnsaveButton(Article article) {
