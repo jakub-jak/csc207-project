@@ -6,11 +6,10 @@ import interface_adapter.saved_articles.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class SavedArticlesView extends JPanel implements ActionListener, PropertyChangeListener {
+public class SavedArticlesView extends JPanel implements PropertyChangeListener {
     private final String viewName = "saved articles";
     private final SavedArticlesViewModel savedArticlesViewModel;
     private final JPanel filterPanel;
@@ -20,12 +19,14 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
     private final RemoveCategoryController removeCategoryController;
     private final UnsaveArticleController unsaveArticleController;
     private final NewsController newsController;
+    private final PerformFilterController performFilterController;
 
     public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel,
                              AddCategoryController addCategoryController,
                              RemoveCategoryController removeCategoryController,
                              UnsaveArticleController unsaveArticleController,
-                             NewsController newsController) {
+                             NewsController newsController,
+                             PerformFilterController performFilterController) {
         this.savedArticlesViewModel = savedArticlesViewModel;
         this.savedArticlesViewModel.addPropertyChangeListener(this);
 
@@ -35,6 +36,7 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
         this.removeCategoryController = removeCategoryController;
         this.unsaveArticleController = unsaveArticleController;
         this.newsController = newsController;
+        this.performFilterController = performFilterController;
 
         // Navbar Panel
         JPanel navigationPanel = new JPanel();
@@ -62,9 +64,15 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
             this.addCategoryController.execute(category); // Execute AddCategory use case
             categoriesFilter.setText(""); // Clear the text field after adding the category
         });
-        addFilterButton.addActionListener(this);
+
+        // Perform filter button and use case
+        JButton performFilterButton = new JButton("Perform Filter");
+        performFilterButton.addActionListener(e -> {
+            this.performFilterController.execute();
+        });
 
         inputPanel.add(addFilterButton);
+        inputPanel.add(performFilterButton);
 
         // Category filter button panel
         filterPanel = new JPanel();
@@ -84,9 +92,25 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
         this.add(articlesPanel);
     }
 
+    /**
+     * This method gets called when a bound property is changed.
+     *
+     * @param evt A PropertyChangeEvent object describing the event source
+     *            and the property that has changed.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().startsWith("add category: ")){
+            String category = evt.getPropertyName().substring("add category: ".length());
+            JButton categoryButton = createCategoryButton(category);
+            filterPanel.add(categoryButton);
+            filterPanel.revalidate();    // Revalidate the layout
+            filterPanel.repaint();       // Repaint the panel to reflect the changes
+        }
+    }
+
     private JButton createCategoryButton(String category) {
         JButton categoryButton = new JButton(category);
-        // TODO: add actionListener for removing a category filter
         categoryButton.addActionListener(e -> {
             // execute remove category use case
             this.removeCategoryController.execute(category);
@@ -190,26 +214,5 @@ public class SavedArticlesView extends JPanel implements ActionListener, Propert
             // this.shareArticleController.execute(article);
         });
         return shareButton;
-    }
-
-    /**
-     * Invoked when an action occurs.
-     *
-     * @param e the event to be processed
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-    /**
-     * This method gets called when a bound property is changed.
-     *
-     * @param evt A PropertyChangeEvent object describing the event source
-     *            and the property that has changed.
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-
     }
 }

@@ -3,18 +3,20 @@ package interface_adapter.saved_articles;
 import entity.Article;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SavedArticlesState {
     private String username = "";
     private String savedArticlesError;
-    private List<Article> articleList = new ArrayList<>();
+    private Map<String, List<Article>> articleMap = new HashMap<>();
     private List<String> categoriesFilterList = new ArrayList<>();
 
     public SavedArticlesState(SavedArticlesState copy) {
         this.username = copy.username;
         this.savedArticlesError = copy.savedArticlesError;
-        this.articleList = copy.articleList;
+        this.articleMap = copy.articleMap;
         this.categoriesFilterList = copy.categoriesFilterList;
     }
 
@@ -36,12 +38,8 @@ public class SavedArticlesState {
         this.savedArticlesError = savedArticlesError;
     }
 
-    public List<Article> getArticleList() {
-        return articleList;
-    }
-
-    public void setArticleList(List<Article> articleList) {
-        this.articleList = articleList;
+    public List<Article> getArticlesByCategory(String category) {
+        return articleMap.get(category);
     }
 
     public List<String> getCategoriesFilterList() {
@@ -50,5 +48,13 @@ public class SavedArticlesState {
 
     public void setCategoriesFilterList(List<String> categoriesFilterList) {
         this.categoriesFilterList = categoriesFilterList;
+    }
+
+    public void addCategory(String category) {
+        this.categoriesFilterList.add(category);
+    }
+
+    public void removeCategory(String category) {
+        this.categoriesFilterList.remove(category);
     }
 }
