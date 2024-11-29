@@ -1,6 +1,7 @@
 package app;
 
 import data_access.CohereDataAccessObject;
+import data_access.EmailDataAccessObject;
 import data_access.InMemoryUserDataAccessObject;
 import data_access.NewsDataAccessObject;
 import interface_adapter.ViewManagerModel;
@@ -25,7 +26,7 @@ public class MainWithInMemory {
      * The main method for starting the program.
      * @param args input to main
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         // Build the main program window, the main panel containing the
         // various cards, and the layout, and stitch them together.
@@ -56,6 +57,7 @@ public class MainWithInMemory {
         final InMemoryUserDataAccessObject userDataAccessObject = new InMemoryUserDataAccessObject();
         final NewsDataAccessObject newsDataAccessObject = new NewsDataAccessObject();
         final CohereDataAccessObject cohereDataAccessObject = new CohereDataAccessObject();
+        final EmailDataAccessObject emailDataAccessObject = new EmailDataAccessObject();
 
         final SignupView signupView = SignupUseCaseFactory.create(viewManagerModel, loginViewModel,
                 signupViewModel, userDataAccessObject);
@@ -66,7 +68,7 @@ public class MainWithInMemory {
         views.add(loginView, loginView.getViewName());
 
         final LoggedInView loggedInView = LoggedinUseCasesFactory.create(viewManagerModel, loggedInViewModel, loginViewModel,
-                userDataAccessObject, newsDataAccessObject, cohereDataAccessObject);
+                userDataAccessObject, newsDataAccessObject, cohereDataAccessObject, emailDataAccessObject);
         views.add(loggedInView, loggedInView.getViewName());
 
         viewManagerModel.setState(signupView.getViewName());

@@ -15,6 +15,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
 import org.apache.commons.codec.binary.Base64;
+import use_case.share_article.ShareArticleEmailDataAccessInterface;
 
 
 import javax.mail.Session;
@@ -29,7 +30,7 @@ import java.security.GeneralSecurityException;
 import java.util.Properties;
 import java.util.Set;
 
-public class EmailDataAccessObject {
+public class EmailDataAccessObject implements ShareArticleEmailDataAccessInterface {
 
     private static final String TEST_EMAIL = "hridaycollege03@gmail.com";
     private final Gmail service;
