@@ -32,7 +32,7 @@ import java.util.Set;
 
 public class EmailDataAccessObject implements ShareArticleEmailDataAccessInterface {
 
-    private static final String TEST_EMAIL = "hridaycollege03@gmail.com";
+    private static final String APP_EMAIL = "newsbuddyapp@gmail.com";
     private final Gmail service;
 
     public EmailDataAccessObject() throws Exception {
@@ -40,7 +40,7 @@ public class EmailDataAccessObject implements ShareArticleEmailDataAccessInterfa
         NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         GsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         service = new Gmail.Builder(httpTransport, jsonFactory, getCredentials(httpTransport, jsonFactory))
-                .setApplicationName("Test Mailer")
+                .setApplicationName("CSC207Project")
                 .build();
 
     }
@@ -50,7 +50,7 @@ public class EmailDataAccessObject implements ShareArticleEmailDataAccessInterfa
             throws IOException {
         // Load client secrets.
 
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(EmailDataAccessObject.class.getResourceAsStream("/client_secret_252486599529-qaunmf5l4l6knr4j83m9ljetrr4jpjgu.apps.googleusercontent.com.json")));
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(EmailDataAccessObject.class.getResourceAsStream("/client_secret_517070072065-qeqlgusgdo22dad8q7uicnaat4pd35m8.apps.googleusercontent.com.json")));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
@@ -69,7 +69,7 @@ public class EmailDataAccessObject implements ShareArticleEmailDataAccessInterfa
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(TEST_EMAIL));
+        email.setFrom(new InternetAddress(APP_EMAIL));
         email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(rec_email));
         email.setSubject(subject);
         email.setContent(message, "text/html");
