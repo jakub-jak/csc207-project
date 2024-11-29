@@ -42,6 +42,14 @@ public class SavedArticlesState {
         return articleMap.get(category);
     }
 
+    public List<Article> getArticleList() {
+        List<Article> articles = new ArrayList<>();
+        for (String key : articleMap.keySet()) {
+            articles.addAll(articleMap.get(key));
+        }
+        return articles;
+    }
+
     public List<String> getCategoriesFilterList() {
         return categoriesFilterList;
     }

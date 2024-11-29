@@ -2,6 +2,7 @@ package view;
 
 import entity.Article;
 import interface_adapter.saved_articles.*;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,14 +20,12 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private final RemoveCategoryController removeCategoryController;
     private final UnsaveArticleController unsaveArticleController;
     private final NewsController newsController;
-    private final PerformFilterController performFilterController;
 
     public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel,
                              AddCategoryController addCategoryController,
                              RemoveCategoryController removeCategoryController,
                              UnsaveArticleController unsaveArticleController,
-                             NewsController newsController,
-                             PerformFilterController performFilterController) {
+                             NewsController newsController) {
         this.savedArticlesViewModel = savedArticlesViewModel;
         this.savedArticlesViewModel.addPropertyChangeListener(this);
 
@@ -36,10 +35,13 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         this.removeCategoryController = removeCategoryController;
         this.unsaveArticleController = unsaveArticleController;
         this.newsController = newsController;
-        this.performFilterController = performFilterController;
 
-        // Navbar Panel
+        // Panels
         JPanel navigationPanel = new JPanel();
+        filterPanel = new JPanel();
+        articlesPanel = new JPanel();
+        
+        // NavBar
         JButton newsButton = new JButton("News");
         newsButton.addActionListener(e -> {
             this.newsController.execute();
@@ -65,17 +67,31 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             categoriesFilter.setText(""); // Clear the text field after adding the category
         });
 
-        // Perform filter button and use case
+        // Perform filter button
         JButton performFilterButton = new JButton("Perform Filter");
         performFilterButton.addActionListener(e -> {
-            this.performFilterController.execute();
+            // Filters the Articles based on the current
+            articlesPanel.removeAll();
+            
+            for (String category: savedArticlesState.getCategoriesFilterList()) {
+                for (Article article : savedArticlesState.getArticlesByCategory(category)) {
+                    JPanel articleSlide = getArticleSlide(article);
+
+                    // Add a divider (separator) after each article
+                    JSeparator separator = new JSeparator();
+                    articlesPanel.add(articleSlide);
+                    articlesPanel.add(separator);
+
+                    articlesPanel.revalidate();    // Revalidate the layout
+                    articlesPanel.repaint();       // Repaint the panel to reflect the changes
+                }
+            }
         });
 
         inputPanel.add(addFilterButton);
         inputPanel.add(performFilterButton);
 
         // Category filter button panel
-        filterPanel = new JPanel();
         for (String category: savedArticlesState.getCategoriesFilterList()){
             JButton categoryButton = createCategoryButton(category);
             filterPanel.add(categoryButton);
@@ -83,7 +99,6 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
 
 
         // Article Panel
-        articlesPanel = new JPanel();
         JScrollPane articlesScrollPane = new JScrollPane(articlesPanel);
         articlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -128,53 +143,8 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         articlesPanel.removeAll();
 
         for (Article article: state.getArticleList()){
-            JPanel articleSlide = new JPanel();
-            articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS)); // Stack components vertically
-
-            // Title
-            JLabel articleTitle = new JLabel(article.getTitle());
-            articleTitle.setFont(new Font("Arial", Font.BOLD, 14));
-
-            // Author
-            JLabel articleAuthor = new JLabel(article.getAuthor());
-            articleAuthor.setFont(new Font("Arial", Font.PLAIN, 12));
-
-            // Date
-            JLabel articleDate = new JLabel(article.getDate());
-            articleDate.setFont(new Font("Arial", Font.PLAIN, 12));
-
-            // Link
-            JLabel articleLink = new JLabel(article.getLink());
-            articleLink.setFont(new Font("Arial", Font.PLAIN, 12));
-            articleLink.setForeground(Color.BLUE);
-
-            // Description
-            JTextArea articleDescription = new JTextArea(article.getDescription());
-            articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
-            articleDescription.setLineWrap(true);
-            articleDescription.setWrapStyleWord(true);
-            articleDescription.setEditable(false); // Disable editing
-            articleDescription.setBackground(articleSlide.getBackground()); // Make the background same as articleSlide
-
-            // Calculate max width of the description as half of the window size
-            int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2; // Get half the screen width
-            articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
-            JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
-
-            // un-save / share buttons
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.add(createUnsaveButton(article));
-            buttonPanel.add(createShareButton(article));
-
-            // Add labels to article slide panel
-            articleSlide.add(articleTitle);
-            articleSlide.add(articleAuthor);
-            articleSlide.add(articleDate);
-            articleSlide.add(articleLink);
-            articleSlide.add(descriptionScrollPane); // Scrollable description
-            articleSlide.add(buttonPanel);
-
-
+            JPanel articleSlide = getArticleSlide(article);
+            
             // Add a divider (separator) after each article
             JSeparator separator = new JSeparator();
             articlesPanel.add(articleSlide);
@@ -183,6 +153,56 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             articlesPanel.revalidate();    // Revalidate the layout
             articlesPanel.repaint();       // Repaint the panel to reflect the changes
         }
+    }
+
+    @NotNull
+    private JPanel getArticleSlide(Article article) {
+        JPanel articleSlide = new JPanel();
+        articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS)); // Stack components vertically
+
+        // Title
+        JLabel articleTitle = new JLabel(article.getTitle());
+        articleTitle.setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Author
+        JLabel articleAuthor = new JLabel(article.getAuthor());
+        articleAuthor.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        // Date
+        JLabel articleDate = new JLabel(article.getDate());
+        articleDate.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        // Link
+        JLabel articleLink = new JLabel(article.getLink());
+        articleLink.setFont(new Font("Arial", Font.PLAIN, 12));
+        articleLink.setForeground(Color.BLUE);
+
+        // Description
+        JTextArea articleDescription = new JTextArea(article.getDescription());
+        articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
+        articleDescription.setLineWrap(true);
+        articleDescription.setWrapStyleWord(true);
+        articleDescription.setEditable(false); // Disable editing
+        articleDescription.setBackground(articleSlide.getBackground()); // Make the background same as articleSlide
+
+        // Calculate max width of the description as half of the window size
+        int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2; // Get half the screen width
+        articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
+        JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
+
+        // un-save / share buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(createUnsaveButton(article));
+        buttonPanel.add(createShareButton(article));
+
+        // Add labels to article slide panel
+        articleSlide.add(articleTitle);
+        articleSlide.add(articleAuthor);
+        articleSlide.add(articleDate);
+        articleSlide.add(articleLink);
+        articleSlide.add(descriptionScrollPane); // Scrollable description
+        articleSlide.add(buttonPanel);
+        return articleSlide;
     }
 
     private JButton createUnsaveButton(Article article) {
