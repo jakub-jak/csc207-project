@@ -6,6 +6,7 @@ import use_case.add_category.AddCategoryDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
 import use_case.save_article.SaveArticleDataAccessInterface;
+import use_case.share_article.ShareArticleUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 import use_case.unsave_article.UnsaveArticleDataAccessInterface;
 
@@ -19,7 +20,7 @@ import java.util.Map;
  */
 public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface,
         LoginUserDataAccessInterface, AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface,
-        SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface {
+        SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface, ShareArticleUserDataAccessInterface {
 
     private String currentUserName;
     private final List<User> Users = new ArrayList<User>();

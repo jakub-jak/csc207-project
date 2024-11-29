@@ -1,6 +1,7 @@
 package app;
 
 import data_access.CohereDataAccessObject;
+import data_access.EmailDataAccessObject;
 import data_access.InMemoryUserDataAccessObject;
 import data_access.NewsDataAccessObject;
 import interface_adapter.ViewManagerModel;
@@ -20,6 +21,9 @@ import use_case.save_article.SaveArticleDataAccessInterface;
 import use_case.save_article.SaveArticleInputBoundary;
 import use_case.save_article.SaveArticleInteractor;
 import use_case.save_article.SaveArticleOutputBoundary;
+import use_case.share_article.ShareArticleEmailDataAccessInterface;
+import use_case.share_article.ShareArticleInteractor;
+import use_case.share_article.ShareArticleUserDataAccessInterface;
 import use_case.unsave_article.UnsaveArticleDataAccessInterface;
 import use_case.unsave_article.UnsaveArticleInputBoundary;
 import use_case.unsave_article.UnsaveArticleInteractor;
@@ -44,7 +48,8 @@ public class LoggedinUseCasesFactory {
             LoginViewModel loginViewModel,
             InMemoryUserDataAccessObject userDataAccessObject,
             NewsDataAccessObject newsDataAccessObject,
-            CohereDataAccessObject cohereDataAccessObject) {
+            CohereDataAccessObject cohereDataAccessObject,
+            EmailDataAccessObject emailDataAccessObject) {
 
         final AddCategoryController addCategoryController =
                 createAddCategoryUseCase(viewManagerModel, loggedInViewModel, loginViewModel, userDataAccessObject);
@@ -56,9 +61,10 @@ public class LoggedinUseCasesFactory {
                 createSaveArticleUseCase(viewManagerModel, loggedInViewModel, loginViewModel, userDataAccessObject);
         final UnsaveArticleController unsaveArticleController =
                 createUnsaveArticleUseCase(viewManagerModel, loggedInViewModel, loginViewModel, userDataAccessObject);
-
+        final ShareArticleController shareArticleController =
+                createShareArticleUseCase( userDataAccessObject, emailDataAccessObject);
         return new LoggedInView(loggedInViewModel, addCategoryController, removeCategoryController,
-                digestController, saveArticleController, unsaveArticleController);
+                digestController, saveArticleController, unsaveArticleController, shareArticleController);
 
     }
 
@@ -140,6 +146,20 @@ public class LoggedinUseCasesFactory {
                 new UnsaveArticleInteractor(userDataAccessObject, unsaveArticleOutputBoundary);
 
         return new UnsaveArticleController(unsaveArticleInteractor);
+    }
+
+    private static ShareArticleController createShareArticleUseCase(
+            ShareArticleUserDataAccessInterface userDataAccessInterface,
+            ShareArticleEmailDataAccessInterface emailDataAccessInterface) {
+
+        //ShareArticlePresenter shareArticlePresenter = new ShareArticlePresenter();
+
+        ShareArticleInteractor shareArticleInteractor = new ShareArticleInteractor(
+                userDataAccessInterface,
+                emailDataAccessInterface
+        );
+
+        return new ShareArticleController(shareArticleInteractor);
     }
 
 }
