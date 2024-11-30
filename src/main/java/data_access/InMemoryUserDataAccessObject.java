@@ -36,13 +36,15 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
     @Override
     public void save(User user) { Users.add(user); }
 
+
     @Override
     public User get(String name) {
         for (User user : Users) {
-            if (user.getName().equals(name)) return user;
+            if (user.getName().equals(this.currentUserName)) return user;
         }
         return null;
     }
+
 
     @Override
     public void setCurrentUser(String name) {
