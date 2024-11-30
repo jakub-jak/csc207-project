@@ -88,7 +88,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                 "tech",
                 "tempContent",
                 "tempLink",
-                "tempDate");
+                "tempDate",
+                "tempDescription");
 
         db.save(tempUser);
         db.setCurrentUsername(tempUser.getName());
@@ -141,7 +142,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                 .append("category", article.getCategory())
                 .append("content", article.getContent())
                 .append("link", article.getLink())
-                .append("date", article.getDate());
+                .append("date", article.getDate())
+                .append("description", article.getDescription());
 
         Bson query = Filters.eq("name", currentUsername);
         Bson update = Updates.addToSet("articles." + article.getCategory(), articleDoc);
@@ -230,8 +232,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                         articleDoc.get("category", String.class),
                         articleDoc.get("content", String.class),
                         articleDoc.get("link", String.class),
-                        articleDoc.get("date", String.class)
-                        ));
+                        articleDoc.get("date", String.class),
+                        articleDoc.get("description", String.class)));
             }
             articles.put(category, currArticles);
         }
