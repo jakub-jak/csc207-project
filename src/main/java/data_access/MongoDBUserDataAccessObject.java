@@ -216,8 +216,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      * @return the user with the given username
      */
     @Override
-    public User get() {
-        Document userDoc = userCollection.find(Filters.eq("name", currentUsername)).first();
+    public User get(String username) {
+        Document userDoc = userCollection.find(Filters.eq("name", username)).first();
         if (userDoc == null) { return null; }
 
         Map<String,List<Article>> articles = new HashMap<>();

@@ -22,7 +22,7 @@ public class SaveArticleInteractorTest {
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), new HashMap<>());
         userRepository.save(user);
-        userRepository.setCurrentUser("Paul");
+        userRepository.setCurrentUsername("Paul");
 
         // This creates a successPresenter that test whether the test case is as we expect.
         SaveArticleOutputBoundary successPresenter = new SaveArticleOutputBoundary() {
@@ -50,7 +50,7 @@ public class SaveArticleInteractorTest {
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), new HashMap<>());
         userRepository.save(user);
-        userRepository.setCurrentUser("Paul");
+        userRepository.setCurrentUsername("Paul");
 
         // add the test article
         userRepository.saveArticle(article);

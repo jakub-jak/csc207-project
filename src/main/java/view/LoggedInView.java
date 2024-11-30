@@ -27,13 +27,15 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private final DigestController digestController;
     private final SaveArticleController saveArticleController;
     private final UnsaveArticleController unsaveArticleController;
+    private final ShareArticleController shareArticleController;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel,
                         AddCategoryController addCategoryController,
                         RemoveCategoryController removeCategoryController,
                         DigestController digestController,
                         SaveArticleController saveArticleController,
-                        UnsaveArticleController unsaveArticleController) {
+                        UnsaveArticleController unsaveArticleController,
+                        ShareArticleController shareArticleController) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
@@ -45,6 +47,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         this.digestController = digestController;
         this.saveArticleController = saveArticleController;
         this.unsaveArticleController = unsaveArticleController;
+        this.shareArticleController = shareArticleController;
 
         // Navbar Panel
         JPanel navigationPanel = new JPanel();
@@ -248,18 +251,31 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         shareButton.setBackground(Color.BLUE);
 
         shareButton.addActionListener(e -> {
-            // execute share article use case
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Sharing article: " + article.getTitle(),
-                    "Share",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            // When I have a shareArticleController, replace the above line with:
-            // this.shareArticleController.execute(article);
+            try {
+                this.shareArticleController.execute(article);
+                // Show a success popup message
+                JOptionPane.showMessageDialog(
+                        null,
+                        "The article has been sent to your email! Please check your inbox.",
+                        "Email Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (Exception ex) {
+                // Show an error popup message in case of an exception
+                JOptionPane.showMessageDialog(
+                        null,
+                        "An error occurred while sending the email. Please try again. " +
+                                "You might want to check if the email address you signed-up with is a valid one.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                throw new RuntimeException(ex);
+            }
         });
+
         return shareButton;
     }
+
 
 
 }
