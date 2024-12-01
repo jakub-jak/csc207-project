@@ -10,6 +10,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import use_case.digest.DigestNewsDataAccessInterface;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -57,7 +63,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                     sortBy != null ? sortBy : "relevancy",
                     page, pageSize, API_KEY);
 
-            // Create a request object
+            // Create a request object for the NewsAPI
             Request request = new Request.Builder()
                     .url(endpoint)
                     .addHeader("Content-Type", "application/json")
@@ -73,6 +79,10 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                     JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
                     JsonArray articlesArray = jsonObject.getAsJsonArray("articles");
 
+                    // Use a thread pool to fetch article contents in parallel
+                    ExecutorService executorService = Executors.newFixedThreadPool(10);
+                    List<Future<Article>> futureArticles = new ArrayList<>();
+
                     for (JsonElement articleElement : articlesArray) {
                         JsonObject articleObject = articleElement.getAsJsonObject();
 
@@ -84,57 +94,87 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                                 ? articleObject.get("url").getAsString() : "";
                         String date = articleObject.has("publishedAt") && !articleObject.get("publishedAt").isJsonNull()
                                 ? articleObject.get("publishedAt").getAsString() : "";
-                        String description = "";
+                        String description = articleObject.has("description") && !articleObject.get("description").isJsonNull()
+                                ? articleObject.get("description").getAsString() : "";
 
-                        // Fetch the article content from the URL
-                        String content = "";
-                        boolean isContentFetched = false;
-                        try {
-                            // Fetch the HTML content of the article URL
-                            Request articleRequest = new Request.Builder()
+                        // Submit a task to fetch and process the article content
+                        Callable<Article> task = () -> {
+                            // Check if the URL is reachable using a HEAD request
+                            Request headRequest = new Request.Builder()
                                     .url(link)
+                                    .head()
                                     .addHeader("User-Agent", "Mozilla/5.0")
                                     .build();
 
-                            try (Response articleResponse = client.newCall(articleRequest).execute()) {
-                                if (articleResponse.isSuccessful() && articleResponse.body() != null) {
-                                    String htmlContent = articleResponse.body().string();
+                            try (Response headResponse = client.newCall(headRequest).execute()) {
+                                if (headResponse.isSuccessful()) {
+                                    // Fetch the HTML content of the article URL
+                                    Request articleRequest = new Request.Builder()
+                                            .url(link)
+                                            .addHeader("User-Agent", "Mozilla/5.0")
+                                            .build();
 
-                                    // Parse the HTML content using jsoup
-                                    Document doc = Jsoup.parse(htmlContent, link);
+                                    // Set timeouts for the request
+                                    OkHttpClient clientWithTimeout = client.newBuilder()
+                                            .connectTimeout(10, TimeUnit.SECONDS)
+                                            .readTimeout(10, TimeUnit.SECONDS)
+                                            .followRedirects(true)
+                                            .build();
 
-                                    // Attempt to extract the main content
-                                    content = extractMainContent(doc);
-                                    isContentFetched = true;
+                                    try (Response articleResponse = clientWithTimeout.newCall(articleRequest).execute()) {
+                                        if (articleResponse.isSuccessful() && articleResponse.body() != null) {
+                                            String htmlContent = articleResponse.body().string();
 
+                                            // Parse the HTML content using jsoup
+                                            Document doc = Jsoup.parse(htmlContent, link);
+
+                                            // Attempt to extract the main content
+                                            String content = extractMainContent(doc);
+
+                                            // Only add the article if content was successfully fetched
+                                            if (content != null && !content.trim().isEmpty()) {
+                                                // Category is not available in the JSON, so set to an empty string
+                                                String category = "";
+
+                                                return new CommonArticle(title, author, category, content, link, date, description);
+                                            } else {
+                                                System.err.println("Skipping article due to empty content for URL: " + link);
+                                            }
+                                        } else {
+                                            System.err.println("Failed to fetch article content for URL: " + link);
+                                        }
+                                    }
                                 } else {
-                                    // Handle error
-                                    System.err.println("Failed to fetch article content for URL: " + link);
+                                    System.err.println("URL is not reachable: " + link);
                                 }
+                            } catch (Exception e) {
+                                System.err.println("Error checking URL: " + link);
                             }
-                        } catch (Exception e) {
-                            System.err.println("Error fetching article content for URL: " + link);
-                            e.printStackTrace();
-                        }
+                            return null;
+                        };
 
-                        // Only add the article if content was successfully fetched
-                        if (isContentFetched && content != null && !content.trim().isEmpty()) {
-                            // Category is not available in the JSON, so set to an empty string
-                            String category = "";
+                        futureArticles.add(executorService.submit(task));
+                    }
 
-                            Article article = new CommonArticle(title, author, category, content, link, date, description);
-                            articles.add(article);
-                        } else {
-                            System.err.println("Skipping article due to empty content for URL: " + link);
+                    // Wait for all tasks to complete and collect the results
+                    for (Future<Article> future : futureArticles) {
+                        try {
+                            Article article = future.get();
+                            if (article != null) {
+                                articles.add(article);
+                            }
+                        } catch (InterruptedException | ExecutionException e) {
+                            System.err.println("Error fetching article: " + e.getMessage());
                         }
                     }
+
+                    executorService.shutdown();
                     return articles;
                 } else {
                     // Handle error
                     String errorBody = response.body() != null ? response.body().string() : "No response body";
                     throw new IOException("Error: HTTP response code " + response.code() + "\n" + errorBody);
                 }
-
             }
         } catch (Exception e) {
             throw new IOException("Error fetching articles: " + e.getMessage(), e);
@@ -169,7 +209,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
 
     public Article fetchFirstArticle(String keyword, String fromDate, String toDate, String language, String sortBy) throws IOException {
         int page = 1;
-        int pageSize = 10;
+        int pageSize = 5;
         int maxPages = 5; // Define a maximum number of pages to prevent infinite loops
 
         while (page <= maxPages) {
