@@ -21,6 +21,8 @@ import use_case.saved_articles.SavedArticlesOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputData;
 
+import java.util.ArrayList;
+
 /**
  * The Presenter for the Change Password Use Case.
  */
