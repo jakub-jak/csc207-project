@@ -5,6 +5,9 @@ import entity.Article;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Save Article DAI.
+ */
 public interface SaveArticleDataAccessInterface {
     /**
      * Saves the article to the user's articles.

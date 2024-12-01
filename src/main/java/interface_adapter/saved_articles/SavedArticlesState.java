@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * State for the saved articles view.
+ */
 public class SavedArticlesState {
     private String username = "";
     private String savedArticlesError;
@@ -20,7 +23,8 @@ public class SavedArticlesState {
         this.categoriesFilterList = copy.categoriesFilterList;
     }
 
-    public SavedArticlesState() {}
+    public SavedArticlesState() {
+    }
 
     public String getUsername() {
         return username;
@@ -38,12 +42,21 @@ public class SavedArticlesState {
         this.savedArticlesError = savedArticlesError;
     }
 
+    /**
+     * Gets the specific article by category.
+     * @param category category
+     * @return list of aticles
+     */
     public List<Article> getArticlesByCategory(String category) {
         return articleMap.get(category);
     }
 
+    /**
+     * Gets a list of articles.
+     * @return list of articles
+     */
     public List<Article> getArticleList() {
-        List<Article> articles = new ArrayList<>();
+        final List<Article> articles = new ArrayList<>();
         for (String key : articleMap.keySet()) {
             articles.addAll(articleMap.get(key));
         }
@@ -58,17 +71,35 @@ public class SavedArticlesState {
         this.categoriesFilterList = categoriesFilterList;
     }
 
+    /**
+     * Add category to list.
+     * @param category category
+     */
     public void addCategory(String category) {
         this.categoriesFilterList.add(category);
     }
 
+    /**
+     * Remove category from list.
+     * @param category category
+     */
     public void removeCategory(String category) {
         this.categoriesFilterList.remove(category);
     }
 
+    /**
+     * Remove article from map.
+     * @param article artilce
+     */
     public void removeArticle(Article article) {
         articleMap.get(article.getCategory()).remove(article);
     }
 
-    public void setArticleMap(Map<String, List<Article>> articleMap) { this.articleMap = articleMap; }
+    /**
+     * Set the article map.
+     * @param articleMap article map
+     */
+    public void setArticleMap(Map<String, List<Article>> articleMap) {
+        this.articleMap = articleMap;
+    }
 }

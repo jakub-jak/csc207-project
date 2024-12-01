@@ -21,8 +21,6 @@ import use_case.saved_articles.SavedArticlesOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputData;
 
-import javax.swing.text.View;
-
 /**
  * The Presenter for the Change Password Use Case.
  */
@@ -80,7 +78,6 @@ public class LoggedInPresenter implements LogoutOutputBoundary, AddCategoryOutpu
         this.viewManagerModel.firePropertyChanged();
     }
 
-
     @Override
     public void prepareSuccessView(DigestOutputData response) {
         final LoggedInState loggedInState = loggedInViewModel.getState();
@@ -116,15 +113,21 @@ public class LoggedInPresenter implements LogoutOutputBoundary, AddCategoryOutpu
 
     // the methods below may not be necessary
     @Override
-    public void handleError(String errorMessage) { }
+    public void handleError(String errorMessage) {
+    }
 
     @Override
-    public void processOutput(DigestOutputData outputData) { }
+    public void processOutput(DigestOutputData outputData) {
+    }
 
     @Override
-    public DigestOutputData getOutputData() { return null; }
+    public DigestOutputData getOutputData() {
+        return null;
+    }
 
     @Override
-    public String getErrorMessage() { return ""; }
+    public String getErrorMessage() {
+        return "";
+    }
 
 }

@@ -4,20 +4,23 @@ import entity.Article;
 import use_case.share_article.ShareArticleInputBoundary;
 import use_case.share_article.ShareArticleInputData;
 
-
+/**
+ * Share Article Controller.
+ */
 public class ShareArticleController {
-    private final ShareArticleInputBoundary ShareArticleUseCaseInteractor;
+    private final ShareArticleInputBoundary shareArticleInputBoundary;
 
-    public ShareArticleController(ShareArticleInputBoundary ShareArticleUseCaseInteractor) {
-        this.ShareArticleUseCaseInteractor = ShareArticleUseCaseInteractor;
+    public ShareArticleController(ShareArticleInputBoundary shareArticleInputBoundary) {
+        this.shareArticleInputBoundary = shareArticleInputBoundary;
     }
 
     /**
      * Executes the ShareArticle Use Case.
      * @param article the article to add
+     * @throws Exception exception
      */
     public void execute(Article article) throws Exception {
-        final ShareArticleInputData ShareArticleInputData = new ShareArticleInputData(article);
-        ShareArticleUseCaseInteractor.execute(ShareArticleInputData);
+        final ShareArticleInputData shareArticleInputData = new ShareArticleInputData(article);
+        shareArticleInputBoundary.execute(shareArticleInputData);
     }
 }

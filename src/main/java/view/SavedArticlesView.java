@@ -13,6 +13,9 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+/**
+ * Saved Articles View.
+ */
 public class SavedArticlesView extends JPanel implements PropertyChangeListener {
     private final String viewName = "saved articles";
     private final SavedArticlesViewModel savedArticlesViewModel;
@@ -29,22 +32,22 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         this.savedArticlesViewModel = savedArticlesViewModel;
         this.savedArticlesViewModel.addPropertyChangeListener(this);
 
-        SavedArticlesState savedArticlesState = this.savedArticlesViewModel.getState();
+        final SavedArticlesState savedArticlesState = this.savedArticlesViewModel.getState();
 
         // Panels
-        JPanel navigationPanel = new JPanel();
+        final JPanel navigationPanel = new JPanel();
         filterPanel = new JPanel();
         articlesPanel = new JPanel();
         articlesPanel.setLayout(new BoxLayout(articlesPanel, BoxLayout.Y_AXIS));
 
         // NavBar
-        JButton newsButton = new JButton("News");
+        final JButton newsButton = new JButton("News");
         newsButton.addActionListener(e -> {
             this.newsController.execute();
         });
-        JLabel savedArticlesTitleLabel = new JLabel("Saved Articles");
+        final JLabel savedArticlesTitleLabel = new JLabel("Saved Articles");
         // TODO: add action listener to go to the login view
-        JButton LogoutButton = new JButton("Log out");
+        final JButton LogoutButton = new JButton("Log out");
         navigationPanel.add(newsButton);
         navigationPanel.add(savedArticlesTitleLabel);
         navigationPanel.add(LogoutButton);
@@ -56,30 +59,30 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         inputPanel.add(categoriesFilter);
 
         // Add category filter button and use case
-        JButton addFilterButton = new JButton("Add Filter");
-        addFilterButton.addActionListener(e -> {
-            String category = categoriesFilter.getText();  // Get the category name from the text field
-            this.addCategoryController.execute(category); // Execute AddCategory use case
-            categoriesFilter.setText(""); // Clear the text field after adding the category
+        final JButton addFilterButton = new JButton("Add Filter");
+        addFilterButton.addActionListener(actionEvent -> {
+            final String category = categoriesFilter.getText();
+            this.addCategoryController.execute(category);
+            categoriesFilter.setText("");
         });
 
         // Perform filter button
-        JButton performFilterButton = new JButton("Perform Filter");
-        performFilterButton.addActionListener(e -> {
+        final JButton performFilterButton = new JButton("Perform Filter");
+        performFilterButton.addActionListener(actionEvent -> {
             // Filters the Articles based on the current
             articlesPanel.removeAll();
             
             for (String category: savedArticlesState.getCategoriesFilterList()) {
                 for (Article article : savedArticlesState.getArticlesByCategory(category)) {
-                    JPanel articleSlide = getArticleSlide(article);
+                    final JPanel articleSlide = getArticleSlide(article);
 
                     // Add a divider (separator) after each article
-                    JSeparator separator = new JSeparator();
+                    final JSeparator separator = new JSeparator();
                     articlesPanel.add(articleSlide);
                     articlesPanel.add(separator);
 
-                    articlesPanel.revalidate();    // Revalidate the layout
-                    articlesPanel.repaint();       // Repaint the panel to reflect the changes
+                    articlesPanel.revalidate();
+                    articlesPanel.repaint();
                 }
             }
         });
@@ -88,19 +91,17 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         inputPanel.add(performFilterButton);
 
         // Category filter button panel
-        for (String category: savedArticlesState.getCategoriesFilterList()){
-            JButton categoryButton = createCategoryButton(category);
+        for (String category: savedArticlesState.getCategoriesFilterList()) {
+            final JButton categoryButton = createCategoryButton(category);
             filterPanel.add(categoryButton);
         }
 
-
         // Article Panel
-        JScrollPane articlesScrollPane = new JScrollPane(articlesPanel);
-
+        final JScrollPane articlesScrollPane = new JScrollPane(articlesPanel);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(navigationPanel);
-        //this.add(inputPanel); Remove because it is not working correctly and I don't have time to fix it
+        // this.add(inputPanel); Remove because it is not working correctly and I don't have time to fix it
         this.add(articlesScrollPane);
     }
 
@@ -113,29 +114,29 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().startsWith("add category: ")){
-            String category = evt.getPropertyName().substring("add category: ".length());
-            JButton categoryButton = createCategoryButton(category);
+            final String category = evt.getPropertyName().substring("add category: ".length());
+            final JButton categoryButton = createCategoryButton(category);
             filterPanel.add(categoryButton);
-            filterPanel.revalidate();    // Revalidate the layout
-            filterPanel.repaint();       // Repaint the panel to reflect the changes
+            filterPanel.revalidate();
+            filterPanel.repaint();
         }
 
-        if (evt.getPropertyName().equals("articles")){
+        if (evt.getPropertyName().equals("articles")) {
             final SavedArticlesState savedArticlesState = savedArticlesViewModel.getState();
             refreshArticlePanel(savedArticlesState);
         }
     }
 
     private JButton createCategoryButton(String category) {
-        JButton categoryButton = new JButton(category);
-        categoryButton.addActionListener(e -> {
+        final JButton categoryButton = new JButton(category);
+        categoryButton.addActionListener(actionEvent -> {
             // execute remove category use case
             this.removeCategoryController.execute(category);
 
             // Remove this button from the panel
             filterPanel.remove(categoryButton);
-            filterPanel.revalidate();    // Revalidate the layout
-            filterPanel.repaint();       // Repaint the panel to reflect the changes
+            filterPanel.revalidate();
+            filterPanel.repaint();
         });
         return categoryButton;
     }
@@ -145,55 +146,59 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         articlesPanel.removeAll();
 
         for (Article article: state.getArticleList()){
-            JPanel articleSlide = getArticleSlide(article);
+            final JPanel articleSlide = getArticleSlide(article);
             
             // Add a divider (separator) after each article
-            JSeparator separator = new JSeparator();
+            final JSeparator separator = new JSeparator();
             articlesPanel.add(articleSlide);
             articlesPanel.add(separator);
 
-            articlesPanel.revalidate();    // Revalidate the layout
-            articlesPanel.repaint();       // Repaint the panel to reflect the changes
+            articlesPanel.revalidate();
+            articlesPanel.repaint();
         }
     }
 
     @NotNull
     private JPanel getArticleSlide(Article article) {
-        JPanel articleSlide = new JPanel();
-        articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS)); // Stack components vertically
+        final JPanel articleSlide = new JPanel();
+        articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS));
+        final String fontName = "Arial";
+        final int fontSize12 = 12;
+        final int fontSize14 = 14;
 
         // Title
-        JLabel articleTitle = new JLabel(article.getTitle());
-        articleTitle.setFont(new Font("Arial", Font.BOLD, 14));
+        final JLabel articleTitle = new JLabel(article.getTitle());
+        articleTitle.setFont(new Font(fontName, Font.BOLD, fontSize14));
 
         // Author
-        JLabel articleAuthor = new JLabel(article.getAuthor());
-        articleAuthor.setFont(new Font("Arial", Font.PLAIN, 12));
+        final JLabel articleAuthor = new JLabel(article.getAuthor());
+        articleAuthor.setFont(new Font(fontName, Font.PLAIN, fontSize12));
 
         // Date
-        JLabel articleDate = new JLabel(article.getDate());
-        articleDate.setFont(new Font("Arial", Font.PLAIN, 12));
+        final JLabel articleDate = new JLabel(article.getDate());
+        articleDate.setFont(new Font(fontName, Font.PLAIN, fontSize12));
 
         // Link
-        JLabel articleLink = new JLabel(article.getLink());
-        articleLink.setFont(new Font("Arial", Font.PLAIN, 12));
+        final JLabel articleLink = new JLabel(article.getLink());
+        articleLink.setFont(new Font(fontName, Font.PLAIN, fontSize12));
         articleLink.setForeground(Color.BLUE);
 
         // Description
-        JTextArea articleDescription = new JTextArea(article.getDescription());
-        articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
+        final JTextArea articleDescription = new JTextArea(article.getDescription());
+        articleDescription.setFont(new Font(fontName, Font.PLAIN, fontSize12));
         articleDescription.setLineWrap(true);
         articleDescription.setWrapStyleWord(true);
-        articleDescription.setEditable(false); // Disable editing
-        articleDescription.setBackground(articleSlide.getBackground()); // Make the background same as articleSlide
+        articleDescription.setEditable(false);
+        articleDescription.setBackground(articleSlide.getBackground());
 
         // Calculate max width of the description as half of the window size
-        int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2; // Get half the screen width
-        articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
-        JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
+        final int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+        final int height = 100;
+        articleDescription.setPreferredSize(new Dimension(maxWidth, height));
+        final JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
 
         // un-save / share buttons
-        JPanel buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
         buttonPanel.add(createUnsaveButton(article));
         buttonPanel.add(createShareButton(article));
 
@@ -202,26 +207,26 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         articleSlide.add(articleAuthor);
         articleSlide.add(articleDate);
         articleSlide.add(articleLink);
-        articleSlide.add(descriptionScrollPane); // Scrollable description
+        articleSlide.add(descriptionScrollPane);
         articleSlide.add(buttonPanel);
         return articleSlide;
     }
 
     private JButton createUnsaveButton(Article article) {
-        JButton unsaveButton = new JButton("Unsave");
+        final JButton unsaveButton = new JButton("Unsave");
         unsaveButton.setBackground(Color.RED);
 
-        unsaveButton.addActionListener(e -> {
+        unsaveButton.addActionListener(actionEvent -> {
             // execute unsave article use case
             this.unsaveArticleController.execute(article);
-            articlesPanel.revalidate();    // Revalidate the layout
-            articlesPanel.repaint();       // Repaint the panel to reflect the changes
+            articlesPanel.revalidate();
+            articlesPanel.repaint();
 
             // Display a success message
             JOptionPane.showMessageDialog(
                     null,
-                    "The article has been successfully unsaved and will not appear under Saved Articles " +
-                            "anymore.",
+                    "The article has been successfully unsaved and will not appear under Saved Articles "
+                            + "anymore.",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -230,10 +235,10 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     }
 
     private JButton createShareButton(Article article) {
-        JButton shareButton = new JButton("Share to my email");
+        final JButton shareButton = new JButton("Share to my email");
         shareButton.setBackground(Color.BLUE);
 
-        shareButton.addActionListener(e -> {
+        shareButton.addActionListener(actionEvent -> {
             try {
                 this.shareArticleController.execute(article);
                 // Show a success popup message
@@ -243,12 +248,13 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
                         "Email Sent",
                         JOptionPane.INFORMATION_MESSAGE
                 );
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 // Show an error popup message in case of an exception
                 JOptionPane.showMessageDialog(
                         null,
-                        "An error occurred while sending the email. Please try again. " +
-                                "You might want to check if the email address you signed-up with is a valid one.",
+                        "An error occurred while sending the email. Please try again. "
+                                + "You might want to check if the email address you signed-up with is a valid one.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );

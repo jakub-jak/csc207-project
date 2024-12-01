@@ -1,7 +1,5 @@
 package use_case.remove_category;
 
-import use_case.add_category.AddCategoryOutputData;
-
 /**
  * The output boundary for the RemoveCategory Use Case.
  */

@@ -1,6 +1,5 @@
 package app;
 
-
 import data_access.CohereDataAccessObject;
 import data_access.EmailDataAccessObject;
 import data_access.MongoDBUserDataAccessObject;
@@ -43,7 +42,6 @@ import use_case.saved_articles.SavedArticlesInputBoundary;
 import use_case.saved_articles.SavedArticlesInteractor;
 import use_case.saved_articles.SavedArticlesOutputBoundary;
 import use_case.share_article.ShareArticleInteractor;
-import use_case.share_article.ShareArticleOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -55,6 +53,9 @@ import view.*;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Builder Pattern for Creating the Application.
+ */
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -63,9 +64,9 @@ public class AppBuilder {
 
     // DAOs
     private final MongoDBUserDataAccessObject mongoDBUserDataAccessObject = new MongoDBUserDataAccessObject();
-    final NewsDataAccessObject newsDataAccessObject = new NewsDataAccessObject();
-    final CohereDataAccessObject cohereDataAccessObject = new CohereDataAccessObject();
-    final EmailDataAccessObject emailDataAccessObject = new EmailDataAccessObject();
+    private final NewsDataAccessObject newsDataAccessObject = new NewsDataAccessObject();
+    private final CohereDataAccessObject cohereDataAccessObject = new CohereDataAccessObject();
+    private final EmailDataAccessObject emailDataAccessObject = new EmailDataAccessObject();
 
     // Views & View Models
     private LoginView loginView;
@@ -96,7 +97,7 @@ public class AppBuilder {
      * Adds the Login View to the application.
      * @return this builder
      */
-    public AppBuilder addLoginView(){
+    public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel);
         cardPanel.add(loginView, loginView.getViewName());
@@ -107,7 +108,7 @@ public class AppBuilder {
      * Adds the Logged In View to the application.
      * @return this builder
      */
-    public AppBuilder addLoggedInView(){
+    public AppBuilder addLoggedInView() {
         loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
@@ -118,7 +119,7 @@ public class AppBuilder {
      * Adds the Saved Articles View to the application.
      * @return this builder
      */
-    public AppBuilder addSavedArticlesView(){
+    public AppBuilder addSavedArticlesView() {
         savedArticlesViewModel = new SavedArticlesViewModel();
         savedArticlesView = new SavedArticlesView(savedArticlesViewModel);
         cardPanel.add(savedArticlesView, savedArticlesView.getViewName());
@@ -147,7 +148,8 @@ public class AppBuilder {
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(mongoDBUserDataAccessObject, loginOutputBoundary);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(mongoDBUserDataAccessObject,
+                loginOutputBoundary);
 
         final LoginController loginController = new LoginController(loginInteractor);
         loginView.setLoginController(loginController);
@@ -161,10 +163,11 @@ public class AppBuilder {
     public AppBuilder addLogoutUseCase() {
         final LogoutOutputBoundary logoutOutputBoundary = new LoggedInPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel, savedArticlesViewModel);
-        final LogoutInputBoundary logoutInputBoundary = new LogoutInteractor(mongoDBUserDataAccessObject, logoutOutputBoundary);
+        final LogoutInputBoundary logoutInputBoundary = new LogoutInteractor(mongoDBUserDataAccessObject,
+                logoutOutputBoundary);
         final LogoutController controller = new LogoutController(logoutInputBoundary);
         // TODO: uncomment when logout is done
-        //loggedInView.setLogoutController(controller);
+        // loggedInView.setLogoutController(controller);
         return this;
     }
 
@@ -174,21 +177,21 @@ public class AppBuilder {
      */
     public AppBuilder addAddCategoryUseCase() {
         // Logged In View
-        AddCategoryOutputBoundary addCategoryOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel , loginViewModel, savedArticlesViewModel);
-        AddCategoryInputBoundary addCategoryInteractor = new AddCategoryInteractor(mongoDBUserDataAccessObject,
+        final AddCategoryOutputBoundary addCategoryOutputBoundary = new LoggedInPresenter(viewManagerModel,
+                loggedInViewModel, loginViewModel, savedArticlesViewModel);
+        final AddCategoryInputBoundary addCategoryInteractor = new AddCategoryInteractor(mongoDBUserDataAccessObject,
                 addCategoryOutputBoundary);
 
-        AddCategoryController controller = new AddCategoryController(addCategoryInteractor);
+        final AddCategoryController controller = new AddCategoryController(addCategoryInteractor);
         loggedInView.setAddCategoryController(controller);
 
         // Saved Articles View
-        AddCategoryOutputBoundary addCategoryOutputBoundary1 = new SavedArticlesPresenter(viewManagerModel,
-                loggedInViewModel , savedArticlesViewModel);
-        AddCategoryInputBoundary addCategoryInteractor1 = new AddCategoryInteractor(mongoDBUserDataAccessObject,
+        final AddCategoryOutputBoundary addCategoryOutputBoundary1 = new SavedArticlesPresenter(viewManagerModel,
+                loggedInViewModel, savedArticlesViewModel);
+        final AddCategoryInputBoundary addCategoryInteractor1 = new AddCategoryInteractor(mongoDBUserDataAccessObject,
                 addCategoryOutputBoundary1);
 
-        AddCategoryController controller1 = new AddCategoryController(addCategoryInteractor1);
+        final AddCategoryController controller1 = new AddCategoryController(addCategoryInteractor1);
         savedArticlesView.setAddCategoryController(controller1);
         return this;
     }
@@ -199,21 +202,23 @@ public class AppBuilder {
      */
     public AppBuilder addRemoveCategoryUseCase() {
         // Logged In View
-        RemoveCategoryOutputBoundary removeCategoryOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel , loginViewModel, savedArticlesViewModel);
-        RemoveCategoryInputBoundary removeCategoryInputBoundary = new RemoveCategoryInteractor(mongoDBUserDataAccessObject,
+        final RemoveCategoryOutputBoundary removeCategoryOutputBoundary = new LoggedInPresenter(viewManagerModel,
+                loggedInViewModel, loginViewModel, savedArticlesViewModel);
+        final RemoveCategoryInputBoundary removeCategoryInputBoundary =
+                new RemoveCategoryInteractor(mongoDBUserDataAccessObject,
                 removeCategoryOutputBoundary);
 
-        RemoveCategoryController controller = new RemoveCategoryController(removeCategoryInputBoundary);
+        final RemoveCategoryController controller = new RemoveCategoryController(removeCategoryInputBoundary);
         loggedInView.setRemoveCategoryController(controller);
 
         // Saved Articles View
-        RemoveCategoryOutputBoundary removeCategoryOutputBoundary1 = new SavedArticlesPresenter(viewManagerModel,
-                loggedInViewModel , savedArticlesViewModel);
-        RemoveCategoryInputBoundary removeCategoryInputBoundary1 = new RemoveCategoryInteractor(mongoDBUserDataAccessObject,
+        final RemoveCategoryOutputBoundary removeCategoryOutputBoundary1 = new SavedArticlesPresenter(viewManagerModel,
+                loggedInViewModel, savedArticlesViewModel);
+        final RemoveCategoryInputBoundary removeCategoryInputBoundary1 =
+                new RemoveCategoryInteractor(mongoDBUserDataAccessObject,
                 removeCategoryOutputBoundary1);
 
-        RemoveCategoryController controller1 = new RemoveCategoryController(removeCategoryInputBoundary1);
+        final RemoveCategoryController controller1 = new RemoveCategoryController(removeCategoryInputBoundary1);
         savedArticlesView.setRemoveCategoryController(controller1);
         return this;
     }
@@ -223,11 +228,12 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addDigestUseCase() {
-        DigestOutputBoundary digestOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel , loginViewModel, savedArticlesViewModel);
-        DigestInputBoundary digestInputBoundary = new DigestInteractor(newsDataAccessObject, cohereDataAccessObject,
+        final DigestOutputBoundary digestOutputBoundary = new LoggedInPresenter(viewManagerModel,
+                loggedInViewModel, loginViewModel, savedArticlesViewModel);
+        final DigestInputBoundary digestInputBoundary =
+                new DigestInteractor(newsDataAccessObject, cohereDataAccessObject,
                 digestOutputBoundary);
-        DigestController controller = new DigestController(digestInputBoundary);
+        final DigestController controller = new DigestController(digestInputBoundary);
         loggedInView.setDigestController(controller);
         return this;
     }
@@ -237,10 +243,10 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addNewsUseCase() {
-        NewsOutputBoundary newsOutputBoundary = new SavedArticlesPresenter(viewManagerModel,
-                loggedInViewModel , savedArticlesViewModel);
-        NewsInputBoundary newsInputBoundary = new NewsInteractor(newsOutputBoundary);
-        NewsController controller = new NewsController(newsInputBoundary);
+        final NewsOutputBoundary newsOutputBoundary = new SavedArticlesPresenter(viewManagerModel,
+                loggedInViewModel, savedArticlesViewModel);
+        final NewsInputBoundary newsInputBoundary = new NewsInteractor(newsOutputBoundary);
+        final NewsController controller = new NewsController(newsInputBoundary);
         savedArticlesView.setNewsController(controller);
         return this;
     }
@@ -250,11 +256,12 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addSaveArticlesUseCase() {
-        SaveArticleOutputBoundary saveArticleOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel , loginViewModel, savedArticlesViewModel);
-        SaveArticleInputBoundary saveArticleInputBoundary = new SaveArticleInteractor(mongoDBUserDataAccessObject,
+        final SaveArticleOutputBoundary saveArticleOutputBoundary = new LoggedInPresenter(viewManagerModel,
+                loggedInViewModel, loginViewModel, savedArticlesViewModel);
+        final SaveArticleInputBoundary saveArticleInputBoundary =
+                new SaveArticleInteractor(mongoDBUserDataAccessObject,
                 saveArticleOutputBoundary);
-        SaveArticleController controller = new SaveArticleController(saveArticleInputBoundary);
+        final SaveArticleController controller = new SaveArticleController(saveArticleInputBoundary);
         loggedInView.setSaveArticleController(controller);
         return this;
     }
@@ -265,19 +272,21 @@ public class AppBuilder {
      */
     public AppBuilder addUnsaveArticlesUseCase() {
         // Logged In View
-        UnsaveArticleOutputBoundary unsaveArticleOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel , loginViewModel, savedArticlesViewModel);
-        UnsaveArticleInputBoundary unsaveArticleInputBoundary = new UnsaveArticleInteractor(mongoDBUserDataAccessObject,
+        final UnsaveArticleOutputBoundary unsaveArticleOutputBoundary = new LoggedInPresenter(viewManagerModel,
+                loggedInViewModel, loginViewModel, savedArticlesViewModel);
+        final UnsaveArticleInputBoundary unsaveArticleInputBoundary = new
+                UnsaveArticleInteractor(mongoDBUserDataAccessObject,
                 unsaveArticleOutputBoundary);
-        UnsaveArticleController controller = new UnsaveArticleController(unsaveArticleInputBoundary);
+        final UnsaveArticleController controller = new UnsaveArticleController(unsaveArticleInputBoundary);
         loggedInView.setUnsaveArticleController(controller);
 
         // Saved Articles View
-        UnsaveArticleOutputBoundary unsaveArticleOutputBoundary1 = new SavedArticlesPresenter(viewManagerModel,
-                loggedInViewModel , savedArticlesViewModel);
-        UnsaveArticleInputBoundary unsaveArticleInputBoundary1 = new UnsaveArticleInteractor(mongoDBUserDataAccessObject,
+        final UnsaveArticleOutputBoundary unsaveArticleOutputBoundary1 = new SavedArticlesPresenter(viewManagerModel,
+                loggedInViewModel, savedArticlesViewModel);
+        final UnsaveArticleInputBoundary unsaveArticleInputBoundary1 =
+                new UnsaveArticleInteractor(mongoDBUserDataAccessObject,
                 unsaveArticleOutputBoundary1);
-        UnsaveArticleController controller1 = new UnsaveArticleController(unsaveArticleInputBoundary1);
+        final UnsaveArticleController controller1 = new UnsaveArticleController(unsaveArticleInputBoundary1);
         savedArticlesView.setUnsaveArticleController(controller1);
 
         return this;
@@ -288,13 +297,12 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addShareArticleUseCase() {
-
         // Instantiate Interactor
-        ShareArticleInteractor shareArticleInteractor = new ShareArticleInteractor(
+        final ShareArticleInteractor shareArticleInteractor = new ShareArticleInteractor(
                 mongoDBUserDataAccessObject, emailDataAccessObject);
 
         // Instantiate Controller
-        ShareArticleController shareArticleController = new ShareArticleController(shareArticleInteractor);
+        final ShareArticleController shareArticleController = new ShareArticleController(shareArticleInteractor);
 
         // Set the Controller in LoggedInView
         loggedInView.setShareArticleController(shareArticleController);
@@ -304,17 +312,17 @@ public class AppBuilder {
         return this;
     }
 
-
     /**
      * Adds the Saved Articles Use Case to the application.
      * @return this builder
      */
     public AppBuilder addSavedArticlesUseCase() {
-        SavedArticlesOutputBoundary savedArticlesOutputBoundary = new LoggedInPresenter(viewManagerModel,
-                loggedInViewModel , loginViewModel, savedArticlesViewModel);
-        SavedArticlesInputBoundary savedArticlesInputBoundary = new SavedArticlesInteractor(mongoDBUserDataAccessObject,
+        final SavedArticlesOutputBoundary savedArticlesOutputBoundary = new LoggedInPresenter(viewManagerModel,
+                loggedInViewModel, loginViewModel, savedArticlesViewModel);
+        final SavedArticlesInputBoundary savedArticlesInputBoundary =
+                new SavedArticlesInteractor(mongoDBUserDataAccessObject,
                 savedArticlesOutputBoundary);
-        SavedArticlesController controller = new SavedArticlesController(savedArticlesInputBoundary);
+        final SavedArticlesController controller = new SavedArticlesController(savedArticlesInputBoundary);
         loggedInView.setSavedArticlesController(controller);
         return this;
     }

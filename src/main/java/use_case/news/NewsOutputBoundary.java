@@ -1,5 +1,8 @@
 package use_case.news;
 
+/**
+ * News Output Boundary for the DAI.
+ */
 public interface NewsOutputBoundary {
     /**
      * Prepares the success view for the News Case.

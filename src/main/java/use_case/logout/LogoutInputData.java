@@ -7,7 +7,9 @@ public class LogoutInputData {
 
     private final String name;
 
-    public LogoutInputData(String name) {this.name = name;}
+    public LogoutInputData(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return this.name;

@@ -10,5 +10,7 @@ public class AddCategoryInputData {
         this.category = inputCategory;
     }
 
-    public String getCategory() { return category; }
+    public String getCategory() {
+        return category;
+    }
 }

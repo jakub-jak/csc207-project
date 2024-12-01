@@ -8,7 +8,11 @@ import entity.Article;
 public class UnsaveArticleInputData {
     private final Article article;
 
-    public UnsaveArticleInputData(Article article) { this.article = article; }
+    public UnsaveArticleInputData(Article article) {
+        this.article = article;
+    }
 
-    public Article getArticle() { return article; }
+    public Article getArticle() {
+        return article;
+    }
 }

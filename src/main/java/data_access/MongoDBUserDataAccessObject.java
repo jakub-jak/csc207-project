@@ -32,6 +32,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * DAO using the MongoDB API.
+ */
 public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterface,
                                                     LoginUserDataAccessInterface,
                                                     LogoutUserDataAccessInterface,
@@ -41,23 +44,12 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                                                     UnsaveArticleDataAccessInterface,
                                                     ShareArticleUserDataAccessInterface,
                                                     SavedArticlesDataAccessInterface {
+    private static String connectionString;
     private String currentUsername;
     private final MongoCollection<Document> userCollection;
-    private static String connectionString;
 
     static {
         connectionString = loadApiKey();
-    }
-
-    private static String loadApiKey() {
-        Properties properties = new Properties();
-        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
-            properties.load(reader);
-            return properties.getProperty("MONGO_API_KEY");
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to load API key from .env file");
-        }
     }
 
     public MongoDBUserDataAccessObject() {
@@ -65,33 +57,49 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
 
         // Connection String to connect to database
 
-        ServerApi serverApi = ServerApi.builder()
+        final ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
                 .build();
 
-        MongoClientSettings settings = MongoClientSettings.builder()
+        final MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
                 .serverApi(serverApi)
                 .build();
 
         // Create a new client and connect to the server
-        MongoClient mongoClient = MongoClients.create(settings);
-        MongoDatabase database = mongoClient.getDatabase("Project");
+        final MongoClient mongoClient = MongoClients.create(settings);
+        final MongoDatabase database = mongoClient.getDatabase("Project");
         database.runCommand(new Document("ping", 1));
         System.out.println("Pinged your deployment. You successfully connected to MongoDB!");
         userCollection = database.getCollection("User");
     }
 
+    private static String loadApiKey() {
+        final Properties properties = new Properties();
+        try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
+            properties.load(reader);
+            return properties.getProperty("MONGO_API_KEY");
+        }
+        catch (IOException ioException) {
+            ioException.printStackTrace();
+            throw new RuntimeException("Failed to load API key from .env file");
+        }
+    }
+
+    /**
+     * Testing Code.
+     * @param args args
+     */
     public static void main(String[] args) {
         // Testing Code
-        MongoDBUserDataAccessObject db = new MongoDBUserDataAccessObject();
+        final MongoDBUserDataAccessObject db = new MongoDBUserDataAccessObject();
 
-        User tempUser = new CommonUser("tempName",
+        final User tempUser = new CommonUser("tempName",
                 "tempPass",
                 new ArrayList<>(),
                 new HashMap<>());
 
-        Article tempArticle = new CommonArticle("tempArticle",
+        final Article tempArticle = new CommonArticle("tempArticle",
                 "tempAuthor",
                 "tech",
                 "tempContent",
@@ -118,8 +126,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public void saveCategory(String category) {
-        Bson query = Filters.eq("name", currentUsername);
-        Bson update = Updates.addToSet("categories", category);
+        final Bson query = Filters.eq("name", currentUsername);
+        final Bson update = Updates.addToSet("categories", category);
         userCollection.updateOne(query, update);
     }
 
@@ -130,8 +138,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public void removeCategory(String category) {
-        Bson query = Filters.eq("name", currentUsername);
-        Bson update = Updates.pull("categories", category);
+        final Bson query = Filters.eq("name", currentUsername);
+        final Bson update = Updates.pull("categories", category);
         userCollection.updateOne(query, update);
     }
 
@@ -142,7 +150,7 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public void saveArticle(Article article) {
-        Document articleDoc = new Document()
+        final Document articleDoc = new Document()
                 .append("title", article.getTitle())
                 .append("author", article.getAuthor())
                 .append("category", article.getCategory())
@@ -151,8 +159,8 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                 .append("date", article.getDate())
                 .append("description", article.getDescription());
 
-        Bson query = Filters.eq("name", currentUsername);
-        Bson update = Updates.addToSet("articles." + article.getCategory(), articleDoc);
+        final Bson query = Filters.eq("name", currentUsername);
+        final Bson update = Updates.addToSet("articles." + article.getCategory(), articleDoc);
         userCollection.updateOne(query, update);
     }
 
@@ -163,15 +171,17 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public Map<String, List<Article>> getUserArticles() {
-        Document userDoc = userCollection.find(Filters.eq("name", currentUsername)).first();
-        if (userDoc == null) { return null; }
+        final Document userDoc = userCollection.find(Filters.eq("name", currentUsername)).first();
+        if (userDoc == null) {
+            return null;
+        }
 
-        Map<String,List<Article>> articles = new HashMap<>();
+        final Map<String, List<Article>> articles = new HashMap<>();
 
-        Map<String,List<Document>> articlesDoc = userDoc.get("articles", Map.class);
+        final Map<String, List<Document>> articlesDoc = userDoc.get("articles", Map.class);
 
-        for (String category: articlesDoc.keySet()){
-            List<Article> currArticles = new ArrayList<>();
+        for (String category: articlesDoc.keySet()) {
+            final List<Article> currArticles = new ArrayList<>();
             for (Document articleDoc: articlesDoc.get(category)) {
                 currArticles.add(new CommonArticle(articleDoc.get("title", String.class),
                         articleDoc.get("author", String.class),
@@ -193,8 +203,9 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public void removeArticle(Article article) {
-        Bson query = Filters.eq("name", currentUsername);
-        Bson update = Updates.pull("articles." + article.getCategory(), new Document("title", article.getTitle()));
+        final Bson query = Filters.eq("name", currentUsername);
+        final Bson update = Updates.pull("articles." + article.getCategory(), new Document("title",
+                article.getTitle()));
         userCollection.updateOne(query, update);
     }
 
@@ -205,10 +216,12 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public List<String> getUserCategories() {
-        Bson query = Filters.eq("name", currentUsername);
-        Document result = userCollection.find(query).first();
+        final Bson query = Filters.eq("name", currentUsername);
+        final Document result = userCollection.find(query).first();
 
-        if (result == null) { return new ArrayList<>(); }
+        if (result == null) {
+            return new ArrayList<>();
+        }
 
         return result.getList("categories", String.class);
     }
@@ -221,7 +234,7 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public boolean existsByName(String username) {
-        Document existsDoc = userCollection.find(Filters.eq("name", username)).first();
+        final Document existsDoc = userCollection.find(Filters.eq("name", username)).first();
         return existsDoc != null;
     }
 
@@ -232,10 +245,12 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public void save(User user) {
-        Document existsDoc = userCollection.find(Filters.eq("name", user.getName())).first();
-        if (existsDoc != null) { return; }
+        final Document existsDoc = userCollection.find(Filters.eq("name", user.getName())).first();
+        if (existsDoc != null) {
+            return;
+        }
 
-        Document userDocument = new Document()
+        final Document userDocument = new Document()
                 .append("name", user.getName())
                 .append("password", user.getPassword())
                 .append("categories", user.getCategories())
@@ -251,15 +266,17 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public User get(String username) {
-        Document userDoc = userCollection.find(Filters.eq("name", username)).first();
-        if (userDoc == null) { return null; }
+        final Document userDoc = userCollection.find(Filters.eq("name", username)).first();
+        if (userDoc == null) {
+            return null;
+        }
 
-        Map<String,List<Article>> articles = new HashMap<>();
+        final Map<String, List<Article>> articles = new HashMap<>();
 
-        Map<String,List<Document>> articlesDoc = userDoc.get("articles", Map.class);
+        final Map<String, List<Document>> articlesDoc = userDoc.get("articles", Map.class);
 
-        for (String category: articlesDoc.keySet()){
-            List<Article> currArticles = new ArrayList<>();
+        for (String category: articlesDoc.keySet()) {
+            final List<Article> currArticles = new ArrayList<>();
             for (Document articleDoc: articlesDoc.get(category)) {
                 currArticles.add(new CommonArticle(articleDoc.get("title", String.class),
                         articleDoc.get("author", String.class),
@@ -294,7 +311,9 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      * @return the username of the current user
      */
     public String getCurrentUser() {
-        if (currentUsername == null) return null;
+        if (currentUsername == null) {
+            return null;
+        }
         return currentUsername;
     }
 

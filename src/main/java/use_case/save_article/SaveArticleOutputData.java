@@ -14,5 +14,7 @@ public class SaveArticleOutputData {
         this.useCaseFailed = useCaseFailed;
     }
 
-    public Article getArticle() { return article; }
+    public Article getArticle() {
+        return article;
+    }
 }

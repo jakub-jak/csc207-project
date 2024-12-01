@@ -12,7 +12,10 @@ import use_case.save_article.SaveArticleOutputData;
 import use_case.unsave_article.UnsaveArticleOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputData;
 
-public class SavedArticlesPresenter implements  NewsOutputBoundary,
+/**
+ * Saved articles presentor.
+ */
+public class SavedArticlesPresenter implements NewsOutputBoundary,
                                                 AddCategoryOutputBoundary,
                                                 RemoveCategoryOutputBoundary,
                                                 UnsaveArticleOutputBoundary,

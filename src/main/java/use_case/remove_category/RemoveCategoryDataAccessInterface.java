@@ -2,6 +2,9 @@ package use_case.remove_category;
 
 import java.util.List;
 
+/**
+ * Remove Category DAI.
+ */
 public interface RemoveCategoryDataAccessInterface {
     /**
      * Saves the category to the current user's categories.

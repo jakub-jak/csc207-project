@@ -3,20 +3,24 @@ package interface_adapter.digest;
 import use_case.digest.DigestOutputBoundary;
 import use_case.digest.DigestOutputData;
 
+/**
+ * Digest Presenter for the digest use case.
+ */
 public class DigestPresenter implements DigestOutputBoundary {
     private DigestOutputData outputData;
     private String errorMessage;
 
-    public DigestPresenter() {}
-
-    @Override
-    public void handleError(String errorMessage) {
-        this.errorMessage = errorMessage;
+    public DigestPresenter() {
     }
 
     @Override
-    public void processOutput(DigestOutputData outputData) {
-        this.outputData = outputData;
+    public void handleError(String error) {
+        this.errorMessage = error;
+    }
+
+    @Override
+    public void processOutput(DigestOutputData digestOutputData) {
+        this.outputData = digestOutputData;
     }
 
     @Override
@@ -30,12 +34,10 @@ public class DigestPresenter implements DigestOutputBoundary {
     }
 
     @Override
-    public void prepareSuccessView(DigestOutputData outputData) {
-
+    public void prepareSuccessView(DigestOutputData digestOutputData) {
     }
 
     @Override
-    public void prepareFailView(String errorMessage) {
-
+    public void prepareFailView(String error) {
     }
 }

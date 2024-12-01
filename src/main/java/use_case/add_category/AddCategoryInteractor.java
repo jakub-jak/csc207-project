@@ -1,9 +1,5 @@
 package use_case.add_category;
 
-import entity.CommonUser;
-import entity.User;
-
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,9 +22,11 @@ public class AddCategoryInteractor implements AddCategoryInputBoundary {
 
         if (categories.contains(inputCategory)) {
             addCategoryPresenter.prepareFailView("Category already exists.");
-        } else if (inputCategory.isEmpty()) {
+        }
+        else if (inputCategory.isEmpty()) {
             addCategoryPresenter.prepareFailView("Please enter a valid category.");
-        } else {
+        }
+        else {
             addCategoryDataAccessObject.saveCategory(inputCategory);
             final AddCategoryOutputData addCategoryOutputData =
                     new AddCategoryOutputData(inputCategory, false);

@@ -21,5 +21,7 @@ public class LoginOutputData {
         return username;
     }
 
-    public List<String> getCategories() { return categories; }
+    public List<String> getCategories() {
+        return categories;
+    }
 }

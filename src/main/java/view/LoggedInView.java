@@ -1,16 +1,13 @@
 package view;
 
 import entity.Article;
-import entity.CommonArticle;
 import interface_adapter.digest.DigestController;
 import interface_adapter.logged_in.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 /**
  * The View for when the user is logged into the program.
@@ -34,47 +31,43 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
-        // the initial state of the logged in view, containing the current user and saved categories
-        LoggedInState initalState = loggedInViewModel.getState();
-
         // Navbar Panel
-        JPanel navigationPanel = new JPanel();
-        JButton savedArticlesButton = new JButton("Saved Articles");
+        final JPanel navigationPanel = new JPanel();
+        final JButton savedArticlesButton = new JButton("Saved Articles");
         savedArticlesButton.addActionListener(e -> {
             this.savedArticlesController.execute();
         });
-        JLabel newsLabel = new JLabel("News");
+        final JLabel newsLabel = new JLabel("News");
         // TODO add method for handling pressing the Log out Button to switch view
-        JButton logoutButton = new JButton("Log out");
+        final JButton logoutButton = new JButton("Log out");
         navigationPanel.add(savedArticlesButton);
         navigationPanel.add(newsLabel);
         navigationPanel.add(logoutButton);
 
-
         // Input panel
-        JPanel inputPanel = new JPanel();
+        final JPanel inputPanel = new JPanel();
         inputPanel.add(new JLabel("Enter Category:"));
 
-        JTextField categoryField = new JTextField(16);
+        final JTextField categoryField = new JTextField(16);
         inputPanel.add(categoryField);
 
         // add category button and use case
-        JButton addCategoryButton = new JButton("Add Category");
-        addCategoryButton.addActionListener(e -> {
-            String category = categoryField.getText();  // Get the category name from the text field
-            this.addCategoryController.execute(category); // Execute AddCategory use case
-            categoryField.setText(""); // Clear the text field after adding the category
+        final JButton addCategoryButton = new JButton("Add Category");
+        addCategoryButton.addActionListener(actionEvent -> {
+            final String category = categoryField.getText();
+            this.addCategoryController.execute(category);
+            categoryField.setText("");
         });
 
         inputPanel.add(addCategoryButton);
 
         // Category Panel
-        JPanel categoryPanel = new JPanel();
+        final JPanel categoryPanel = new JPanel();
 
         categoryButtonsPanel = new JPanel();
         categoryButtonsPanel.setLayout(new FlowLayout());
 
-        JButton generateButton = createGenerateButton();
+        final JButton generateButton = createGenerateButton();
 
         // inputPanel.add(generateButton);  // consider putting this in the input panel
         categoryPanel.add(inputPanel);
@@ -85,7 +78,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         articlePanel = new JPanel();
         articlePanel.setLayout(new BoxLayout(articlePanel, BoxLayout.Y_AXIS));
 
-        JScrollPane scrollArticlePanel = new JScrollPane(articlePanel);  // Wrap the articlePanel in a JScrollPane to make it scrollable
+        final JScrollPane scrollArticlePanel = new JScrollPane(articlePanel);
         scrollArticlePanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -97,23 +90,23 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // Initilize
-        if (evt.getPropertyName().equals("init")){
+        if (evt.getPropertyName().equals("init")) {
             // Populate the categoryButtonsPanel with the saved categories of the current user
             final LoggedInState state = loggedInViewModel.getState();
-            for (String category: state.getCategoriesList()){
-                JButton categoryButton = createCategoryButton(category);
+            for (String category: state.getCategoriesList()) {
+                final JButton categoryButton = createCategoryButton(category);
                 categoryButtonsPanel.add(categoryButton);
             }
-            categoryButtonsPanel.revalidate();    // Revalidate the layout
-            categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+            categoryButtonsPanel.revalidate();
+            categoryButtonsPanel.repaint();
         }
 
-        if (evt.getPropertyName().startsWith("add category: ")){
-            String category = evt.getPropertyName().substring("add category: ".length());
-            JButton categoryButton = createCategoryButton(category);
+        if (evt.getPropertyName().startsWith("add category: ")) {
+            final String category = evt.getPropertyName().substring("add category: ".length());
+            final JButton categoryButton = createCategoryButton(category);
             categoryButtonsPanel.add(categoryButton);
-            categoryButtonsPanel.revalidate();    // Revalidate the layout
-            categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+            categoryButtonsPanel.revalidate();
+            categoryButtonsPanel.repaint();
         }
 
         // Populate the articlePanel with articles for each article the user generates.
@@ -132,41 +125,45 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         articlePanel.removeAll();
 
         for (Article article: state.getArticleList()){
-            JPanel articleSlide = new JPanel();
-            articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS)); // Stack components vertically
+            final JPanel articleSlide = new JPanel();
+            articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS));
+            final String fontName = "Arial";
+            final int fontSize12 = 12;
+            final int fontSize14 = 14;
 
             // Title
-            JLabel articleTitle = new JLabel(article.getTitle());
-            articleTitle.setFont(new Font("Arial", Font.BOLD, 14));
+            final JLabel articleTitle = new JLabel(article.getTitle());
+            articleTitle.setFont(new Font(fontName, Font.BOLD, fontSize14));
 
             // Author
-            JLabel articleAuthor = new JLabel(article.getAuthor());
-            articleAuthor.setFont(new Font("Arial", Font.PLAIN, 12));
+            final JLabel articleAuthor = new JLabel(article.getAuthor());
+            articleAuthor.setFont(new Font(fontName, Font.PLAIN, fontSize14));
 
             // Date
-            JLabel articleDate = new JLabel(article.getDate());
-            articleDate.setFont(new Font("Arial", Font.PLAIN, 12));
+            final JLabel articleDate = new JLabel(article.getDate());
+            articleDate.setFont(new Font(fontName, Font.PLAIN, fontSize12));
 
             // Link
-            JLabel articleLink = new JLabel(article.getLink());
-            articleLink.setFont(new Font("Arial", Font.PLAIN, 12));
+            final JLabel articleLink = new JLabel(article.getLink());
+            articleLink.setFont(new Font(fontName, Font.PLAIN, fontSize12));
             articleLink.setForeground(Color.BLUE);
 
             // Description
-            JTextArea articleDescription = new JTextArea(article.getDescription());
+            final JTextArea articleDescription = new JTextArea(article.getDescription());
             articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
             articleDescription.setLineWrap(true);
             articleDescription.setWrapStyleWord(true);
-            articleDescription.setEditable(false); // Disable editing
-            articleDescription.setBackground(articleSlide.getBackground()); // Make the background same as articleSlide
+            articleDescription.setEditable(false);
+            articleDescription.setBackground(articleSlide.getBackground());
 
             // Calculate max width of the description as half of the window size
-            int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2; // Get half the screen width
-            articleDescription.setPreferredSize(new Dimension(maxWidth, 100)); // Set preferred size with max width and some height
-            JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
+            final int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
+            final int height = 100;
+            articleDescription.setPreferredSize(new Dimension(maxWidth, height));
+            final JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
 
             // save / un-save / share buttons
-            JPanel buttonPanel = new JPanel();
+            final JPanel buttonPanel = new JPanel();
             buttonPanel.add(createSaveButton(article));
             buttonPanel.add(createUnsaveButton(article));
             buttonPanel.add(createShareButton(article));
@@ -176,38 +173,35 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             articleSlide.add(articleAuthor);
             articleSlide.add(articleDate);
             articleSlide.add(articleLink);
-            articleSlide.add(descriptionScrollPane); // Scrollable description
+            articleSlide.add(descriptionScrollPane);
             articleSlide.add(buttonPanel);
 
-
             // Add a divider (separator) after each article
-            JSeparator separator = new JSeparator();
+            final JSeparator separator = new JSeparator();
             articlePanel.add(articleSlide);
             articlePanel.add(separator);
-
-            articlePanel.revalidate();    // Revalidate the layout
-            articlePanel.repaint();       // Repaint the panel to reflect the changes
+            articlePanel.revalidate();
+            articlePanel.repaint();
         }
     }
 
     private JButton createCategoryButton(String category) {
-        JButton categoryButton = new JButton(category);
-        categoryButton.addActionListener(e -> {
+        final JButton categoryButton = new JButton(category);
+        categoryButton.addActionListener(actionEvent -> {
             // execute remove category use case
             this.removeCategoryController.execute(category);
-
             // Remove this button from the panel
             categoryButtonsPanel.remove(categoryButton);
-            categoryButtonsPanel.revalidate();    // Revalidate the layout
-            categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+            categoryButtonsPanel.revalidate();
+            categoryButtonsPanel.repaint();
         });
         return categoryButton;
     }
 
     private JButton createGenerateButton() {
-        JButton generateButton = new JButton("Generate");
+        final JButton generateButton = new JButton("Generate");
         generateButton.setBackground(Color.GREEN);
-        generateButton.addActionListener(e -> {
+        generateButton.addActionListener(actionEvent -> {
             // execute digest use case
             this.digestController.execute(loggedInViewModel.getState().getCategoriesList().toArray(new String[0]));
         });
@@ -215,20 +209,20 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     }
 
     private JButton createSaveButton(Article article) {
-        JButton saveButton = new JButton("Save");
+        final JButton saveButton = new JButton("Save");
         saveButton.setBackground(Color.GREEN);
 
-        saveButton.addActionListener(e -> {
+        saveButton.addActionListener(actionEvent -> {
             // execute save article use case
             this.saveArticleController.execute(article);
-            articlePanel.revalidate();    // Revalidate the layout
-            articlePanel.repaint();       // Repaint the panel to reflect the changes
+            articlePanel.revalidate();
+            articlePanel.repaint();
 
             // Display a success message
             JOptionPane.showMessageDialog(
                     null,
-                    "The article has been successfully saved! You can now view this article under Saved " +
-                            "Articles.",
+                    "The article has been successfully saved! You can now view this article under Saved "
+                            + "Articles.",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -237,20 +231,20 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     }
 
     private JButton createUnsaveButton(Article article) {
-        JButton unsaveButton = new JButton("Unsave");
+        final JButton unsaveButton = new JButton("Unsave");
         unsaveButton.setBackground(Color.RED);
 
-        unsaveButton.addActionListener(e -> {
+        unsaveButton.addActionListener(actionEvent -> {
             // execute unsave article use case
             this.unsaveArticleController.execute(article);
-            articlePanel.revalidate();    // Revalidate the layout
-            articlePanel.repaint();       // Repaint the panel to reflect the changes
+            articlePanel.revalidate();
+            articlePanel.repaint();
 
             // Display a success message
             JOptionPane.showMessageDialog(
                     null,
-                    "The article has been successfully unsaved and will not appear under Saved Articles " +
-                            "anymore.",
+                    "The article has been successfully unsaved and will not appear under Saved Articles "
+                            + "anymore.",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -259,10 +253,10 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     }
 
     private JButton createShareButton(Article article) {
-        JButton shareButton = new JButton("Share to my email");
+        final JButton shareButton = new JButton("Share to my email");
         shareButton.setBackground(Color.BLUE);
 
-        shareButton.addActionListener(e -> {
+        shareButton.addActionListener(actionEvent -> {
             try {
                 this.shareArticleController.execute(article);
                 // Show a success popup message
@@ -272,12 +266,13 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
                         "Email Sent",
                         JOptionPane.INFORMATION_MESSAGE
                 );
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 // Show an error popup message in case of an exception
                 JOptionPane.showMessageDialog(
                         null,
-                        "An error occurred while sending the email. Please try again. " +
-                                "You might want to check if the email address you signed-up with is a valid one.",
+                        "An error occurred while sending the email. Please try again. "
+                                + "You might want to check if the email address you signed-up with is a valid one.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
