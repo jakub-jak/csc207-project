@@ -3,6 +3,7 @@ package view;
 import entity.Article;
 import interface_adapter.digest.DigestController;
 import interface_adapter.logged_in.*;
+import interface_adapter.logout.LogoutController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +27,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private UnsaveArticleController unsaveArticleController;
     private ShareArticleController shareArticleController;
     private SavedArticlesController savedArticlesController;
+    private LogoutController logoutController;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -37,12 +39,11 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         savedArticlesButton.addActionListener(e -> {
             this.savedArticlesController.execute();
         });
-        final JLabel newsLabel = new JLabel("News");
-        // TODO add method for handling pressing the Log out Button to switch view
-        final JButton logoutButton = new JButton("Log out");
+
+        // adding saved articles and logout use cases to navbar
         navigationPanel.add(savedArticlesButton);
-        navigationPanel.add(newsLabel);
-        navigationPanel.add(logoutButton);
+        navigationPanel.add(new JLabel("News"));
+        navigationPanel.add(createLogoutButton());
 
         // Input panel
         final JPanel inputPanel = new JPanel();
@@ -52,14 +53,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         inputPanel.add(categoryField);
 
         // add category button and use case
-        final JButton addCategoryButton = new JButton("Add Category");
-        addCategoryButton.addActionListener(actionEvent -> {
-            final String category = categoryField.getText();
-            this.addCategoryController.execute(category);
-            categoryField.setText("");
-        });
-
-        inputPanel.add(addCategoryButton);
+        inputPanel.add(createAddCategoryButton(categoryField));
 
         // Category Panel
         final JPanel categoryPanel = new JPanel();
@@ -71,7 +65,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         // inputPanel.add(generateButton);  // consider putting this in the input panel
         categoryPanel.add(inputPanel);
-        categoryPanel.add(categoryButtonsPanel);
         categoryPanel.add(generateButton);
 
         // Article Panel
@@ -84,13 +77,16 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(navigationPanel);
         this.add(categoryPanel);
+        this.add(categoryButtonsPanel);
         this.add(scrollArticlePanel);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // Initilize
+        // Initialize
         if (evt.getPropertyName().equals("init")) {
+            categoryButtonsPanel.removeAll();
+            articlePanel.removeAll();
             // Populate the categoryButtonsPanel with the saved categories of the current user
             final LoggedInState state = loggedInViewModel.getState();
             for (String category: state.getCategoriesList()) {
@@ -99,6 +95,8 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             }
             categoryButtonsPanel.revalidate();
             categoryButtonsPanel.repaint();
+            articlePanel.revalidate();
+            articlePanel.repaint();
         }
 
         if (evt.getPropertyName().startsWith("add category: ")) {
@@ -185,6 +183,16 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    private JButton createAddCategoryButton(JTextField categoryField) {
+        final JButton addCategoryButton = new JButton("Add Category");
+        addCategoryButton.addActionListener(actionEvent -> {
+            final String category = categoryField.getText();
+            this.addCategoryController.execute(category);
+            categoryField.setText("");
+        });
+        return addCategoryButton;
+    }
+
     private JButton createCategoryButton(String category) {
         final JButton categoryButton = new JButton(category);
         categoryButton.addActionListener(actionEvent -> {
@@ -204,6 +212,15 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         generateButton.addActionListener(actionEvent -> {
             // execute digest use case
             this.digestController.execute(loggedInViewModel.getState().getCategoriesList().toArray(new String[0]));
+        });
+        return generateButton;
+    }
+
+    private JButton createLogoutButton() {
+        final JButton generateButton = new JButton("Logout");
+        generateButton.addActionListener(actionEvent -> {
+            // execute logout use case
+            this.logoutController.execute(loggedInViewModel.getState().getUsername());
         });
         return generateButton;
     }
@@ -309,5 +326,9 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     public void setSavedArticlesController(SavedArticlesController savedArticlesController) {
         this.savedArticlesController = savedArticlesController;
+    }
+
+    public void setLogoutController(LogoutController logOutController) {
+        this.logoutController = logOutController;
     }
 }

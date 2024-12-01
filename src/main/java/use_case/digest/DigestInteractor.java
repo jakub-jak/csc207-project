@@ -34,7 +34,7 @@ public class DigestInteractor implements DigestInputBoundary {
             articles = digestNewsDataAccessInterface.fetchFirstMultiple(keywords, fromDate, toDate, language, sortBy);
         }
         catch (IOException ioException) {
-            digestPresenter.handleError("Error in fetching articles");
+            digestPresenter.prepareFailView("Error in fetching articles");
             ioException.printStackTrace();
         }
 
@@ -49,7 +49,6 @@ public class DigestInteractor implements DigestInputBoundary {
         }
 
         final DigestOutputData digestOutputData = new DigestOutputData(articles);
-        digestPresenter.processOutput(digestOutputData);
         digestPresenter.prepareSuccessView(digestOutputData);
     }
 }

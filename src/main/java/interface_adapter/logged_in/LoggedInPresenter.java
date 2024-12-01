@@ -21,11 +21,18 @@ import use_case.saved_articles.SavedArticlesOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputData;
 
+import java.util.ArrayList;
+
 /**
  * The Presenter for the Change Password Use Case.
  */
-public class LoggedInPresenter implements LogoutOutputBoundary, AddCategoryOutputBoundary, RemoveCategoryOutputBoundary,
-        DigestOutputBoundary, SaveArticleOutputBoundary, UnsaveArticleOutputBoundary, SavedArticlesOutputBoundary {
+public class LoggedInPresenter implements LogoutOutputBoundary,
+        AddCategoryOutputBoundary,
+        RemoveCategoryOutputBoundary,
+        DigestOutputBoundary,
+        SaveArticleOutputBoundary,
+        UnsaveArticleOutputBoundary,
+        SavedArticlesOutputBoundary {
 
     private final LoggedInViewModel loggedInViewModel;
     private final LoginViewModel loginViewModel;
@@ -56,15 +63,6 @@ public class LoggedInPresenter implements LogoutOutputBoundary, AddCategoryOutpu
         loggedInState.removeCategory(response.getCategory());
         loggedInViewModel.firePropertyChanged("remove category: " + response.getCategory());
     }
-
-    // TODO: Uncomment after implementing use cases for the prepareSuccessView Overloading
-//    // Update LoggedInState with new articles following the digest UseCase
-//    @Override
-//    public void prepareSuccessView(digestOuputData response) {
-//        final LoggedInState loggedInState = loggedInViewModel.getState();
-//        loggedInState.setArticleList(response);
-//        loggedInViewModel.firePropertyChanged("articles");
-//    }
 
     // Switch to Login View when the logout is pressed
     @Override
@@ -109,25 +107,6 @@ public class LoggedInPresenter implements LogoutOutputBoundary, AddCategoryOutpu
         final LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setLoggedInError(error);
         loggedInViewModel.firePropertyChanged();
-    }
-
-    // the methods below may not be necessary
-    @Override
-    public void handleError(String errorMessage) {
-    }
-
-    @Override
-    public void processOutput(DigestOutputData outputData) {
-    }
-
-    @Override
-    public DigestOutputData getOutputData() {
-        return null;
-    }
-
-    @Override
-    public String getErrorMessage() {
-        return "";
     }
 
 }

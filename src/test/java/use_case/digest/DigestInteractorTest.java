@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import data_access.NewsDataAccessObject;
 import data_access.CohereDataAccessObject;
-import interface_adapter.digest.DigestPresenter;
 import entity.Article;
 
 import java.util.List;
@@ -15,16 +14,12 @@ public class DigestInteractorTest {
 
     private DigestNewsDataAccessInterface newsDataAccess;
     private DigestCohereDataAccessInterface cohereDataAccess;
-    private DigestPresenter digestPresenter;
-    private DigestInteractor digestInteractor;
 
     @BeforeEach
     public void setUp() {
         // Use the actual NewsAPI and CohereAPI implementations
         newsDataAccess = new NewsDataAccessObject();
         cohereDataAccess = new CohereDataAccessObject();
-        digestPresenter = new DigestPresenter();
-        digestInteractor = new DigestInteractor(newsDataAccess, cohereDataAccess, digestPresenter);
     }
 
     @Test
@@ -35,25 +30,30 @@ public class DigestInteractorTest {
                 java.time.LocalDate.now().toString(),
                 "en",
                 "popularity");
-        // Act
-        digestInteractor.execute(inputData);
 
-        // Assert
-        String errorMessage = digestPresenter.getErrorMessage();
+        // Create a successPresenter that test whether the test case is as we expect.
+        DigestOutputBoundary successPresenter = new DigestOutputBoundary() {
 
-        if (!"Error in fetching articles".equals(errorMessage)) {
-            DigestOutputData outputData = digestPresenter.getOutputData();
-            assertNotNull(outputData, "Output data should not be null");
-            List<Article> articles = outputData.getArticles();
-            assertNotNull(articles, "Articles list should not be null");
-            assertFalse(articles.isEmpty(), "Articles list should not be empty");
+            @Override
+            public void prepareSuccessView(DigestOutputData outputData) {
+                assertNotNull(outputData, "Output data should not be null");
+                List<Article> articles = outputData.getArticles();
+                assertNotNull(articles, "Articles list should not be null");
+                assertFalse(articles.isEmpty(), "Articles list should not be empty");
 
-            for (Article article : articles) {
-                assertNotEquals("Error in summarizing article", article.getDescription(),
-                        "Article description should not be 'Error in summarizing article'");
+                for (Article article : articles) {
+                    assertNotEquals("Error in summarizing article", article.getDescription(),
+                            "Article description should not be 'Error in summarizing article'");
+                }
             }
-        } else {
-            fail("Error in fetching articles");
-        }
+
+            @Override
+            public void prepareFailView(String errorMessage) {
+                fail("Error in fetching articles");
+            }
+        };
+
+        DigestInputBoundary interactor = new DigestInteractor(newsDataAccess, cohereDataAccess, successPresenter);
+        interactor.execute(inputData);
     }
 }

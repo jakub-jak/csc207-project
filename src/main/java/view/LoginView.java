@@ -59,6 +59,12 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
                                     currentState.getUsername(),
                                     currentState.getPassword()
                             );
+
+                            // clear the user input
+                            usernameInputField.setText("");
+                            passwordInputField.setText("");
+                            currentState.setUsername("");
+                            currentState.setPassword("");
                         }
                     }
                 }
