@@ -20,6 +20,7 @@ public class MainApplication {
                 .addSaveArticlesUseCase()
                 .addUnsaveArticlesUseCase()
                 .addShareArticleUseCase()
+                .addShareArticleUseCase()
                 .addSavedArticlesUseCase()
                 .build();
 
