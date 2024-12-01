@@ -86,6 +86,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         // Initialize
         if (evt.getPropertyName().equals("init")) {
             categoryButtonsPanel.removeAll();
+            articlePanel.removeAll();
             // Populate the categoryButtonsPanel with the saved categories of the current user
             final LoggedInState state = loggedInViewModel.getState();
             for (String category: state.getCategoriesList()) {
@@ -94,6 +95,8 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             }
             categoryButtonsPanel.revalidate();
             categoryButtonsPanel.repaint();
+            articlePanel.revalidate();
+            articlePanel.repaint();
         }
 
         if (evt.getPropertyName().startsWith("add category: ")) {
