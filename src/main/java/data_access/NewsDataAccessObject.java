@@ -1,22 +1,6 @@
 package data_access;
 
-import entity.Article;
-import com.google.gson.*;
-import entity.CommonArticle;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import use_case.digest.DigestNewsDataAccessInterface;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
+// Standard Java imports
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,6 +9,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+// Third-party imports
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+// Ungrouped imports
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import entity.Article;
+import entity.CommonArticle;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import use_case.digest.DigestNewsDataAccessInterface;
 
 /**
  * The DAO for news data using OkHttp.
@@ -63,138 +70,224 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
      * @return list of articles
      * @throws IOException exception
      */
-    public List<Article> fetchArticlesByKeyword(String keyword, String fromDate, String toDate, String language, String sortBy, int page, int pageSize) throws IOException {
+    public List<Article> fetchArticlesByKeyword(String keyword, String fromDate, String toDate,
+                                                String language, String sortBy, int page, int pageSize)
+            throws IOException {
         final List<Article> articles = new ArrayList<>();
         try {
-            // URL encode the keyword and build the endpoint URL
-            final String encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString());
-            final String endpoint = String.format("%severything?q=%s&from=%s&to=%s&language=%s&sortBy=%s&page=%d&pageSize=%d&apiKey=%s",
-                    BASE_URL, encodedKeyword,
-                    fromDate != null ? fromDate : "",
-                    toDate != null ? toDate : "",
-                    language != null ? language : "en",
-                    sortBy != null ? sortBy : "relevancy",
-                    page, pageSize, API_KEY);
+            final String endpoint = buildEndpointUrl(keyword, fromDate, toDate, language, sortBy, page, pageSize);
 
-            // Create a request object
             final Request request = new Request.Builder()
                     .url(endpoint)
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            // Execute the request and get the response
-            try (Response response = CLIENT.newCall(request).execute()) {
-                if (response.isSuccessful() && response.body() != null) {
-                    final String jsonResponse = response.body().string();
+            final String jsonResponse = executeHttpRequest(request);
 
-                    // Parse the JSON response
-                    final Gson gson = new Gson();
-                    final JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
-                    final JsonArray articlesArray = jsonObject.getAsJsonArray("articles");
+            final List<JsonObject> articleJsonObjects = parseArticlesFromJson(jsonResponse);
 
-                    // Use a thread pool to fetch article contents in parallel
-                    ExecutorService executorService = Executors.newFixedThreadPool(10);
-                    List<Future<Article>> futureArticles = new ArrayList<>();
+            final List<Callable<Article>> tasks = createArticleFetchTasks(articleJsonObjects);
 
-                    for (JsonElement articleElement : articlesArray) {
-                        final JsonObject articleObject = articleElement.getAsJsonObject();
+            articles.addAll(executeArticleFetchTasks(tasks));
 
-                        final String title = articleObject.has("title") && !articleObject.get("title").isJsonNull()
-                                ? articleObject.get("title").getAsString() : "";
-                        final String author = articleObject.has("author") && !articleObject.get("author").isJsonNull()
-                                ? articleObject.get("author").getAsString() : "";
-                        final String link = articleObject.has("url") && !articleObject.get("url").isJsonNull()
-                                ? articleObject.get("url").getAsString() : "";
-                        final String date = articleObject.has("publishedAt") && !articleObject.get("publishedAt").isJsonNull()
-                                ? articleObject.get("publishedAt").getAsString() : "";
-                        final String description = "";
+            return articles;
 
-                        // Submit a task to fetch and process the article content
-                        Callable<Article> task = () -> {
-                            // Check if the URL is reachable using a HEAD request
-                            Request headRequest = new Request.Builder()
-                                    .url(link)
-                                    .head()
-                                    .addHeader("User-Agent", "Mozilla/5.0")
-                                    .build();
-
-                            try (Response headResponse = client.newCall(headRequest).execute()) {
-                                if (headResponse.isSuccessful()) {
-                                    // Fetch the HTML content of the article URL
-                                    Request articleRequest = new Request.Builder()
-                                            .url(link)
-                                            .addHeader("User-Agent", "Mozilla/5.0")
-                                            .build();
-
-                                    // Set timeouts for the request
-                                    OkHttpClient clientWithTimeout = client.newBuilder()
-                                            .connectTimeout(10, TimeUnit.SECONDS)
-                                            .readTimeout(10, TimeUnit.SECONDS)
-                                            .followRedirects(true)
-                                            .build();
-
-                                    try (Response articleResponse = clientWithTimeout.newCall(articleRequest).execute()) {
-                                        if (articleResponse.isSuccessful() && articleResponse.body() != null) {
-                                            String htmlContent = articleResponse.body().string();
-
-                                            // Parse the HTML content using jsoup
-                                            Document doc = Jsoup.parse(htmlContent, link);
-
-                                            // Attempt to extract the main content
-                                            String content = extractMainContent(doc);
-
-                                            // Only add the article if content was successfully fetched
-                                            if (content != null && !content.trim().isEmpty()) {
-                                                // Category is not available in the JSON, so set to an empty string
-                                                String category = "";
-
-                                                return new CommonArticle(title, author, category, content, link, date, description);
-                                            } else {
-                                                System.err.println("Skipping article due to empty content for URL: " + link);
-                                            }
-                                        } else {
-                                            System.err.println("Failed to fetch article content for URL: " + link);
-                                        }
-                                    }
-                                } else {
-                                    System.err.println("URL is not reachable: " + link);
-                                }
-                            } catch (Exception e) {
-                                System.err.println("Error checking URL: " + link);
-                            }
-                            return null;
-                        };
-
-                        futureArticles.add(executorService.submit(task));
-                    }
-
-                    // Wait for all tasks to complete and collect the results
-                    for (Future<Article> future : futureArticles) {
-                        try {
-                            Article article = future.get();
-                            if (article != null) {
-                                articles.add(article);
-                            }
-                        } catch (InterruptedException | ExecutionException e) {
-                            System.err.println("Error fetching article: " + e.getMessage());
-                        }
-                    }
-
-                    executorService.shutdown();
-                    return articles;
-                }
-                else {
-                    // Handle error
-                    final String errorBody = response.body() != null ? response.body().string() : "No response body";
-                    throw new IOException("Error: HTTP response code " + response.code() + "\n" + errorBody);
-                }
-            }
         }
-        catch (Exception exception) {
-            throw new IOException("Error fetching articles: " + exception.getMessage(), exception);
+        catch (IOException ioException) {
+            throw new IOException("Error fetching articles: " + ioException.getMessage(), ioException);
         }
     }
 
+    private String buildEndpointUrl(String keyword, String fromDate, String toDate,
+                                    String language, String sortBy, int page, int pageSize) throws IOException {
+        final String encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString());
+
+        final String fromDateParam;
+        if (fromDate != null && !fromDate.isEmpty()) {
+            fromDateParam = fromDate;
+        }
+        else {
+            fromDateParam = "";
+        }
+
+        final String toDateParam;
+        if (toDate != null && !toDate.isEmpty()) {
+            toDateParam = toDate;
+        }
+        else {
+            toDateParam = "";
+        }
+
+        final String languageParam;
+        if (language != null && !language.isEmpty()) {
+            languageParam = language;
+        }
+        else {
+            languageParam = "en";
+        }
+
+        final String sortByParam;
+        if (sortBy != null && !sortBy.isEmpty()) {
+            sortByParam = sortBy;
+        }
+        else {
+            sortByParam = "relevancy";
+        }
+
+        return String.format(
+                "%severything?q=%s&from=%s&to=%s&language=%s&sortBy=%s&page=%d&pageSize=%d&apiKey=%s",
+                BASE_URL, encodedKeyword, fromDateParam, toDateParam, languageParam, sortByParam,
+                page, pageSize, API_KEY);
+    }
+
+    private String executeHttpRequest(Request request) throws IOException {
+        try (Response response = CLIENT.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                return response.body().string();
+            }
+            else {
+                final String errorBody;
+                if (response.body() != null) {
+                    errorBody = response.body().string();
+                }
+                else {
+                    errorBody = "No response body";
+                }
+                throw new IOException("Error: HTTP response code " + response.code() + "\n" + errorBody);
+            }
+        }
+    }
+
+    private List<JsonObject> parseArticlesFromJson(String jsonResponse) {
+        final Gson gson = new Gson();
+        final JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
+        final JsonArray articlesArray = jsonObject.getAsJsonArray("articles");
+
+        final List<JsonObject> articleJsonObjects = new ArrayList<>();
+        for (JsonElement articleElement : articlesArray) {
+            articleJsonObjects.add(articleElement.getAsJsonObject());
+        }
+        return articleJsonObjects;
+    }
+
+    private List<Callable<Article>> createArticleFetchTasks(List<JsonObject> articleJsonObjects) {
+        final List<Callable<Article>> tasks = new ArrayList<>();
+
+        for (JsonObject articleObject : articleJsonObjects) {
+            final String title = getJsonString(articleObject, "title");
+            final String author = getJsonString(articleObject, "author");
+            final String link = getJsonString(articleObject, "url");
+            final String date = getJsonString(articleObject, "publishedAt");
+            final String description = "";
+
+            tasks.add(() -> fetchArticleContent(title, author, link, date, description));
+        }
+        return tasks;
+    }
+
+    private Article fetchArticleContent(String title, String author, String link, String date, String description) {
+        Article result = null;
+
+        if (isUrlReachable(link)) {
+            final String htmlContent = fetchHtmlContent(link);
+            if (htmlContent != null) {
+                final String content = extractMainContent(Jsoup.parse(htmlContent, link));
+                if (content != null && !content.trim().isEmpty()) {
+                    final String category = "";
+                    result = new CommonArticle(title, author, category, content, link, date, description);
+                }
+                else {
+                    System.err.println("Skipping article due to empty content for URL: " + link);
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean isUrlReachable(String url) {
+        boolean isReachable = false;
+
+        final Request headRequest = new Request.Builder()
+                .url(url)
+                .head()
+                .addHeader("User-Agent", "Mozilla/5.0")
+                .build();
+
+        try (Response headResponse = CLIENT.newCall(headRequest).execute()) {
+            isReachable = headResponse.isSuccessful();
+        }
+        catch (IOException ioException) {
+            System.err.println("Error checking URL: " + url);
+        }
+        return isReachable;
+    }
+
+    private String fetchHtmlContent(String url) {
+        String htmlContent = null;
+
+        final Request articleRequest = new Request.Builder()
+                .url(url)
+                .addHeader("User-Agent", "Mozilla/5.0")
+                .build();
+
+        final int timeToWait = 10;
+
+        final OkHttpClient clientWithTimeout = CLIENT.newBuilder()
+                .connectTimeout(timeToWait, TimeUnit.SECONDS)
+                .readTimeout(timeToWait, TimeUnit.SECONDS)
+                .followRedirects(true)
+                .build();
+
+        try (Response articleResponse = clientWithTimeout.newCall(articleRequest).execute()) {
+            if (articleResponse.isSuccessful() && articleResponse.body() != null) {
+                htmlContent = articleResponse.body().string();
+            }
+            else {
+                System.err.println("Failed to fetch article content for URL: " + url);
+            }
+        }
+        catch (IOException ioException) {
+            System.err.println("Error fetching content for URL: " + url);
+        }
+        return htmlContent;
+    }
+
+    private String getJsonString(JsonObject jsonObject, String memberName) {
+        String result = "";
+        if (jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull()) {
+            result = jsonObject.get(memberName).getAsString();
+        }
+        return result;
+    }
+
+    private List<Article> executeArticleFetchTasks(List<Callable<Article>> tasks) {
+        final List<Article> articles = new ArrayList<>();
+        final ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+        try {
+            final List<Future<Article>> futures = executorService.invokeAll(tasks);
+
+            for (Future<Article> future : futures) {
+                try {
+                    final Article article = future.get();
+                    if (article != null) {
+                        articles.add(article);
+                    }
+                }
+                catch (InterruptedException | ExecutionException executionException) {
+                    System.err.println("Error fetching article: " + executionException.getMessage());
+                }
+            }
+        }
+        catch (InterruptedException interruptedException) {
+            System.err.println("Task execution interrupted: " + interruptedException.getMessage());
+        }
+        finally {
+            executorService.shutdown();
+        }
+
+        return articles;
+    }
 
     private String extractMainContent(Document doc) {
         // Remove script and style elements
@@ -234,8 +327,9 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
     public Article fetchFirstArticle(String keyword, String fromDate, String toDate, String language, String sortBy)
             throws IOException {
         int page = 1;
-        int pageSize = 5;
-        int maxPages = 5; // Define a maximum number of pages to prevent infinite loops
+        final int pageSize = 5;
+        // Define a maximum number of pages to prevent infinite loops
+        final int maxPages = 5;
 
         while (page <= maxPages) {
             final List<Article> articles = fetchArticlesByKeyword(keyword, fromDate, toDate, language, sortBy, page,
@@ -261,7 +355,11 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
      * @param sortBy sort by
      * @return list of articles
      */
-    public List<Article> fetchFirstMultiple(String[] keywords, String fromDate, String toDate, String language, String sortBy) {
+    public List<Article> fetchFirstMultiple(String[] keywords,
+                                            String fromDate,
+                                            String toDate,
+                                            String language,
+                                            String sortBy) {
         final List<Article> articles = new ArrayList<>();
 
         for (String keyword : keywords) {
