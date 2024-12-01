@@ -3,6 +3,7 @@ package view;
 import entity.Article;
 import interface_adapter.logged_in.AddCategoryController;
 import interface_adapter.logged_in.RemoveCategoryController;
+import interface_adapter.logged_in.ShareArticleController;
 import interface_adapter.logged_in.UnsaveArticleController;
 import interface_adapter.saved_articles.*;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private AddCategoryController addCategoryController;
     private RemoveCategoryController removeCategoryController;
     private UnsaveArticleController unsaveArticleController;
+    private ShareArticleController shareArticleController;
     private NewsController newsController;
 
     public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel) {
@@ -223,16 +225,28 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         shareButton.setBackground(Color.BLUE);
 
         shareButton.addActionListener(e -> {
-            // execute share article use case
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Sharing article: " + article.getTitle(),
-                    "Share",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            // When I have a shareArticleController, replace the above line with:
-            // this.shareArticleController.execute(article);
+            try {
+                this.shareArticleController.execute(article);
+                // Show a success popup message
+                JOptionPane.showMessageDialog(
+                        null,
+                        "The article has been sent to your email! Please check your inbox.",
+                        "Email Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (Exception ex) {
+                // Show an error popup message in case of an exception
+                JOptionPane.showMessageDialog(
+                        null,
+                        "An error occurred while sending the email. Please try again. " +
+                                "You might want to check if the email address you signed-up with is a valid one.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                throw new RuntimeException(ex);
+            }
         });
+
         return shareButton;
     }
 
@@ -250,6 +264,10 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
 
     public void setUnsaveArticleController(UnsaveArticleController unsaveArticleController) {
         this.unsaveArticleController = unsaveArticleController;
+    }
+
+    public void setShareArticleController(ShareArticleController shareArticleController) {
+        this.shareArticleController = shareArticleController;
     }
 
     public void setNewsController(NewsController newsController) {

@@ -299,6 +299,8 @@ public class AppBuilder {
         // Set the Controller in LoggedInView
         loggedInView.setShareArticleController(shareArticleController);
 
+        // Set the Controller in Saved Articles View
+        savedArticlesView.setShareArticleController(shareArticleController);
         return this;
     }
 
