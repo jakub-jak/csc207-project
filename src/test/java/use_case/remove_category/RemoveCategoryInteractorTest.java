@@ -21,7 +21,7 @@ public class RemoveCategoryInteractorTest {
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
-        userRepository.setCurrentUser("Paul");
+        userRepository.setCurrentUsername("Paul");
         // add the desired category to remove
         userRepository.saveCategory("Horror");
 
@@ -50,7 +50,7 @@ public class RemoveCategoryInteractorTest {
 
         User user = new CommonUser("Paul", "password", new ArrayList<>(), Collections.emptyMap());
         userRepository.save(user);
-        userRepository.setCurrentUser("Paul");
+        userRepository.setCurrentUsername("Paul");
         // add some random category
         userRepository.saveCategory("Mystery");
 
