@@ -33,32 +33,38 @@ public interface User {
     Map<String, List<Article>> getArticles();
 
     /**
-     * Update user category preferences
+     * Update user category preferences.
+     * @param categories categories.
      */
     void setCategories(List<String> categories);
 
     /**
-     * Update user articles
+     * Update user articles.
+     * @param articles articles
      */
-    void setArticles(Map<String,List<Article>> articles);
+    void setArticles(Map<String, List<Article>> articles);
 
     /**
-     * Adds one category
+     * Adds one category.
+     * @param category category
      */
     void addCategory(String category);
 
     /**
-     * Deletes one category
+     * Deletes one category.
+     * @param category category
      */
     void deleteCategory(String category);
 
     /**
-     * Adds one article
+     * Adds one article.
+     * @param article article
      */
     void addArticle(Article article);
 
     /**
-     * Deletes one article
+     * Deletes one article.
+     * @param article article
      */
     void deleteArticle(Article article);
 }

@@ -9,7 +9,6 @@ public class LogoutInteractor implements LogoutInputBoundary {
 
     public LogoutInteractor(LogoutUserDataAccessInterface userDataAccessInterface,
                             LogoutOutputBoundary logoutOutputBoundary) {
-        // Which parameter is the DAO and which is the presenter?
         this.userDataAccessObject = userDataAccessInterface;
         this.logoutPresenter = logoutOutputBoundary;
     }
@@ -25,4 +24,3 @@ public class LogoutInteractor implements LogoutInputBoundary {
         logoutPresenter.prepareSuccessView(new LogoutOutputData(name, false));
     }
 }
-

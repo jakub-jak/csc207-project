@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DigestInteractor implements DigestInputBoundary{
-
+/**
+ * Digest interactor.
+ */
+public class DigestInteractor implements DigestInputBoundary {
     private final DigestNewsDataAccessInterface digestNewsDataAccessInterface;
     private final DigestCohereDataAccessInterface digestCohereDataAccessInterface;
     private final DigestOutputBoundary digestPresenter;
@@ -22,7 +24,7 @@ public class DigestInteractor implements DigestInputBoundary{
     public void execute(DigestInputData digestInputData) {
         final String[] keywords = digestInputData.getKeywords();
         final String fromDate = digestInputData.getFromDate();
-        final String toDate =  digestInputData.getToDate();
+        final String toDate = digestInputData.getToDate();
         final String language = digestInputData.getLanguage();
         final String sortBy = digestInputData.getSortBy();
 
@@ -30,21 +32,24 @@ public class DigestInteractor implements DigestInputBoundary{
 
         try {
             articles = digestNewsDataAccessInterface.fetchFirstMultiple(keywords, fromDate, toDate, language, sortBy);
-        } catch (IOException e) {
+        }
+        catch (IOException ioException) {
             digestPresenter.handleError("Error in fetching articles");
-            e.printStackTrace();
+            ioException.printStackTrace();
         }
 
         for (Article article : articles) {
             try {
                 article.setDescription(digestCohereDataAccessInterface.summarize(article.getContent()));
-            } catch (IOException e) {
+            }
+            catch (IOException ioException) {
                 article.setDescription("Error in summarizing article");
-                e.printStackTrace();
+                ioException.printStackTrace();
             }
         }
 
         final DigestOutputData digestOutputData = new DigestOutputData(articles);
         digestPresenter.processOutput(digestOutputData);
+        digestPresenter.prepareSuccessView(digestOutputData);
     }
 }

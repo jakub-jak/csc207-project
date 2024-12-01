@@ -15,11 +15,10 @@ public class RemoveCategoryController {
 
     /**
      * Executes the RemoveCategory Use Case.
-     * @param username the username of the current user
      * @param category the category to remove
      */
-    public void execute(String username, String category) {
-        final RemoveCategoryInputData removeCategoryInputData = new RemoveCategoryInputData(username, category);
+    public void execute(String category) {
+        final RemoveCategoryInputData removeCategoryInputData = new RemoveCategoryInputData(category);
         removeCategoryUseCaseInteractor.execute(removeCategoryInputData);
     }
 

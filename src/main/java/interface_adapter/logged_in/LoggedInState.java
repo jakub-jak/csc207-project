@@ -30,23 +30,47 @@ public class LoggedInState {
         return username;
     }
 
-    public List<String> getCategoriesList() { return categoriesList; }
+    public List<String> getCategoriesList() {
+        return categoriesList;
+    }
 
-    public List<Article> getArticleList() { return articleList; }
+    public List<Article> getArticleList() {
+        return articleList;
+    }
 
-    public void setCategoriesList(List<String> categoriesList) { this.categoriesList = categoriesList; }
+    public void setCategoriesList(List<String> categoriesList) {
+        this.categoriesList = categoriesList;
+    }
 
-    public void setArticleList(List<Article> articleList) { this.articleList = articleList; }
+    public void setArticleList(List<Article> articleList) {
+        this.articleList = articleList;
+    }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getLoggedInError() { return loggedInError; }
+    public String getLoggedInError() {
+        return loggedInError;
+    }
 
-    public void setLoggedInError(String loggedInError) { this.loggedInError = loggedInError; }
+    public void setLoggedInError(String loggedInError) {
+        this.loggedInError = loggedInError;
+    }
 
-    public void addCategory(String category) { this.categoriesList.add(category); }
+    /**
+     * Adds a category to the list.
+     * @param category category to add
+     */
+    public void addCategory(String category) {
+        this.categoriesList.add(category);
+    }
 
-    public void removeCategory(String category) { this.categoriesList.remove(category); }
+    /**
+     * Removes a category to the list.
+     * @param category category to remove
+     */
+    public void removeCategory(String category) {
+        this.categoriesList.remove(category);
+    }
 }

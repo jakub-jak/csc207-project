@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * The RemoveCategory Interactor.
  */
-public class RemoveCategoryInteractor implements RemoveCategoryInputBoundary  {
+public class RemoveCategoryInteractor implements RemoveCategoryInputBoundary {
     private final RemoveCategoryDataAccessInterface removecategoryDataAccessObject;
     private final RemoveCategoryOutputBoundary removeCategoryPresenter;
 
@@ -17,17 +17,16 @@ public class RemoveCategoryInteractor implements RemoveCategoryInputBoundary  {
 
     @Override
     public void execute(RemoveCategoryInputData removeCategoryInputData) {
-        final String username = removeCategoryInputData.getUsername();
         final String inputCategory = removeCategoryInputData.getCategory();
-        final List<String> categories = removecategoryDataAccessObject.getUserCategories(username);
+        final List<String> categories = removecategoryDataAccessObject.getUserCategories();
 
-        if (! categories.contains(inputCategory)) {
+        if (!categories.contains(inputCategory)) {
             removeCategoryPresenter.prepareFailView("Category does not exist.");
         }
         else {
-            removecategoryDataAccessObject.saveRemovedCategory(username, inputCategory);
+            removecategoryDataAccessObject.removeCategory(inputCategory);
             final RemoveCategoryOutputData removeCategoryOutputData =
-                    new RemoveCategoryOutputData(username, inputCategory, false);
+                    new RemoveCategoryOutputData(inputCategory, false);
             removeCategoryPresenter.prepareSuccessView(removeCategoryOutputData);
         }
     }

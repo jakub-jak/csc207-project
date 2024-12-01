@@ -2,18 +2,19 @@ package use_case.add_category;
 
 import java.util.List;
 
+/**
+ * Data Access Interface for the Add Category Use Case.
+ */
 public interface AddCategoryDataAccessInterface {
     /**
      * Saves the category to the user's categories.
-     * @param username the user to save
      * @param category the category to save
      */
-    void saveAddedCategory(String username, String category);
+    void saveCategory(String category);
 
     /**
-     * Gets the given user's category list.
-     * @param username the given user
-     * @return the given user's category list.
+     * Gets the current user's category list.
+     * @return the current user's category list.
      */
-    List<String> getUserCategories(String username);
+    List<String> getUserCategories();
 }

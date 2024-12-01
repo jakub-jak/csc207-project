@@ -1,5 +1,8 @@
 package entity;
 
+/**
+ * CommonArticle implementation of the Article Interface.
+ */
 public class CommonArticle implements Article {
     private final String title;
     private final String author;
@@ -9,7 +12,8 @@ public class CommonArticle implements Article {
     private final String date;
     private String description;
 
-    public CommonArticle(String title, String author, String category, String content, String link, String date, String description) {
+    public CommonArticle(String title, String author, String category, String content, String link,
+                         String date, String description) {
         this.title = title;
         this.author = author;
         this.category = category;
@@ -19,27 +23,40 @@ public class CommonArticle implements Article {
         this.description = description;
     }
 
+    @Override
+    public String getTitle() {
+        return title;
+    }
 
     @Override
-    public String getTitle() { return title; }
+    public String getAuthor() {
+        return author;
+    }
 
     @Override
-    public String getAuthor() { return author; }
+    public String getCategory() {
+        return category;
+    }
 
     @Override
-    public String getCategory() { return category; }
+    public String getContent() {
+        return content;
+    }
 
     @Override
-    public String getContent() { return content; }
+    public String getLink() {
+        return link;
+    }
 
     @Override
-    public String getLink() { return link; }
+    public String getDate() {
+        return date;
+    }
 
     @Override
-    public String getDate() { return date; }
-
-    @Override
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
     @Override
     public void setDescription(String description) {

@@ -17,19 +17,20 @@ public class CohereDataAccessObject implements DigestCohereDataAccessInterface {
     // Constants
     private static final String BASE_URL = "https://api.cohere.ai/v1/";
     private static final String API_KEY;
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final OkHttpClient CLIENT = new OkHttpClient();
 
     static {
         API_KEY = loadApiKey();
     }
 
     private static String loadApiKey() {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
             properties.load(reader);
             return properties.getProperty("COHERE_API_KEY");
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (IOException ioException) {
+            ioException.printStackTrace();
             throw new RuntimeException("Failed to load API key from .env file");
         }
     }
@@ -43,23 +44,23 @@ public class CohereDataAccessObject implements DigestCohereDataAccessInterface {
      */
     public String summarize(String inputText) throws IOException {
         // Build the endpoint URL
-        String endpoint = BASE_URL + "summarize";
+        final String endpoint = BASE_URL + "summarize";
 
         // Create JSON payload with additional parameters
-        JsonObject jsonBody = new JsonObject();
+        final JsonObject jsonBody = new JsonObject();
         jsonBody.addProperty("text", inputText);
-        jsonBody.addProperty("length", "short"); // Specify single-sentence summary
+        jsonBody.addProperty("length", "short");
 
         // Optionally, you can set other parameters like 'temperature', 'model', etc.
         // jsonBody.addProperty("temperature", 0.5);
 
         // Build the request
-        RequestBody body = RequestBody.create(
+        final RequestBody body = RequestBody.create(
                 jsonBody.toString(),
                 MediaType.parse("application/json")
         );
 
-        Request request = new Request.Builder()
+        final Request request = new Request.Builder()
                 .url(endpoint)
                 .post(body)
                 .addHeader("Authorization", "Bearer " + API_KEY)
@@ -67,19 +68,20 @@ public class CohereDataAccessObject implements DigestCohereDataAccessInterface {
                 .build();
 
         // Execute the request and get the response
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = CLIENT.newCall(request).execute()) {
             if (response.isSuccessful() && response.body() != null) {
-                String jsonResponse = response.body().string();
+                final String jsonResponse = response.body().string();
 
                 // Parse the JSON response
-                Gson gson = new Gson();
-                JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
-                String summary = jsonObject.get("summary").getAsString();
+                final Gson gson = new Gson();
+                final JsonObject jsonObject = gson.fromJson(jsonResponse, JsonObject.class);
+                final String summary = jsonObject.get("summary").getAsString();
 
                 return summary;
-            } else {
+            }
+            else {
                 // Handle error
-                String errorBody = response.body() != null ? response.body().string() : "No response body";
+                final String errorBody = response.body() != null ? response.body().string() : "No response body";
                 throw new IOException("Error: HTTP response code " + response.code() + "\n" + errorBody);
             }
         }
