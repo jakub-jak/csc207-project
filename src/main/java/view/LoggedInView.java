@@ -22,37 +22,27 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private final JPanel categoryButtonsPanel;
     private final JPanel articlePanel;
 
-    private final AddCategoryController addCategoryController;
-    private final RemoveCategoryController removeCategoryController;
-    private final DigestController digestController;
-    private final SaveArticleController saveArticleController;
-    private final UnsaveArticleController unsaveArticleController;
-    private final ShareArticleController shareArticleController;
+    private AddCategoryController addCategoryController;
+    private RemoveCategoryController removeCategoryController;
+    private DigestController digestController;
+    private SaveArticleController saveArticleController;
+    private UnsaveArticleController unsaveArticleController;
+    private ShareArticleController shareArticleController;
+    private SavedArticlesController savedArticlesController;
 
-    public LoggedInView(LoggedInViewModel loggedInViewModel,
-                        AddCategoryController addCategoryController,
-                        RemoveCategoryController removeCategoryController,
-                        DigestController digestController,
-                        SaveArticleController saveArticleController,
-                        UnsaveArticleController unsaveArticleController,
-                        ShareArticleController shareArticleController) {
+    public LoggedInView(LoggedInViewModel loggedInViewModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.loggedInViewModel.addPropertyChangeListener(this);
 
         // the initial state of the logged in view, containing the current user and saved categories
         LoggedInState initalState = loggedInViewModel.getState();
 
-        this.addCategoryController = addCategoryController;
-        this.removeCategoryController = removeCategoryController;
-        this.digestController = digestController;
-        this.saveArticleController = saveArticleController;
-        this.unsaveArticleController = unsaveArticleController;
-        this.shareArticleController = shareArticleController;
-
         // Navbar Panel
         JPanel navigationPanel = new JPanel();
-        // TODO add method for handling pressing the Saved Articles Button to switch view
         JButton savedArticlesButton = new JButton("Saved Articles");
+        savedArticlesButton.addActionListener(e -> {
+            this.savedArticlesController.execute();
+        });
         JLabel newsLabel = new JLabel("News");
         // TODO add method for handling pressing the Log out Button to switch view
         JButton logoutButton = new JButton("Log out");
@@ -83,13 +73,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         categoryButtonsPanel = new JPanel();
         categoryButtonsPanel.setLayout(new FlowLayout());
-        // Populate the categoryButtonsPanel with the saved categories of the current user
-        for (String category: initalState.getCategoriesList()){
-            JButton categoryButton = createCategoryButton(category);
-            categoryButtonsPanel.add(categoryButton);
-        }
-        categoryButtonsPanel.revalidate();    // Revalidate the layout
-        categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
 
         JButton generateButton = createGenerateButton();
 
@@ -113,6 +96,17 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        // Initilize
+        if (evt.getPropertyName().equals("init")){
+            // Populate the categoryButtonsPanel with the saved categories of the current user
+            final LoggedInState state = loggedInViewModel.getState();
+            for (String category: state.getCategoriesList()){
+                JButton categoryButton = createCategoryButton(category);
+                categoryButtonsPanel.add(categoryButton);
+            }
+            categoryButtonsPanel.revalidate();    // Revalidate the layout
+            categoryButtonsPanel.repaint();       // Repaint the panel to reflect the changes
+        }
 
         if (evt.getPropertyName().startsWith("add category: ")){
             String category = evt.getPropertyName().substring("add category: ".length());
@@ -276,6 +270,31 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         return shareButton;
     }
 
+    public void setAddCategoryController(AddCategoryController addCategoryController) {
+        this.addCategoryController = addCategoryController;
+    }
 
+    public void setRemoveCategoryController(RemoveCategoryController removeCategoryController) {
+        this.removeCategoryController = removeCategoryController;
+    }
 
+    public void setDigestController(DigestController digestController) {
+        this.digestController = digestController;
+    }
+
+    public void setSaveArticleController(SaveArticleController saveArticleController) {
+        this.saveArticleController = saveArticleController;
+    }
+
+    public void setUnsaveArticleController(UnsaveArticleController unsaveArticleController) {
+        this.unsaveArticleController = unsaveArticleController;
+    }
+
+    public void setShareArticleController(ShareArticleController shareArticleController) {
+        this.shareArticleController = shareArticleController;
+    }
+
+    public void setSavedArticlesController(SavedArticlesController savedArticlesController) {
+        this.savedArticlesController = savedArticlesController;
+    }
 }

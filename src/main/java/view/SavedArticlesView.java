@@ -1,12 +1,14 @@
 package view;
 
 import entity.Article;
+import interface_adapter.logged_in.AddCategoryController;
+import interface_adapter.logged_in.RemoveCategoryController;
+import interface_adapter.logged_in.UnsaveArticleController;
 import interface_adapter.saved_articles.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -16,31 +18,23 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private final JPanel filterPanel;
     private final JPanel articlesPanel;
 
-    private final AddCategoryController addCategoryController;
-    private final RemoveCategoryController removeCategoryController;
-    private final UnsaveArticleController unsaveArticleController;
-    private final NewsController newsController;
+    private AddCategoryController addCategoryController;
+    private RemoveCategoryController removeCategoryController;
+    private UnsaveArticleController unsaveArticleController;
+    private NewsController newsController;
 
-    public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel,
-                             AddCategoryController addCategoryController,
-                             RemoveCategoryController removeCategoryController,
-                             UnsaveArticleController unsaveArticleController,
-                             NewsController newsController) {
+    public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel) {
         this.savedArticlesViewModel = savedArticlesViewModel;
         this.savedArticlesViewModel.addPropertyChangeListener(this);
 
         SavedArticlesState savedArticlesState = this.savedArticlesViewModel.getState();
 
-        this.addCategoryController = addCategoryController;
-        this.removeCategoryController = removeCategoryController;
-        this.unsaveArticleController = unsaveArticleController;
-        this.newsController = newsController;
-
         // Panels
         JPanel navigationPanel = new JPanel();
         filterPanel = new JPanel();
         articlesPanel = new JPanel();
-        
+        articlesPanel.setLayout(new BoxLayout(articlesPanel, BoxLayout.Y_AXIS));
+
         // NavBar
         JButton newsButton = new JButton("News");
         newsButton.addActionListener(e -> {
@@ -100,11 +94,12 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
 
         // Article Panel
         JScrollPane articlesScrollPane = new JScrollPane(articlesPanel);
-        articlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
+
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(navigationPanel);
-        this.add(categoriesFilter);
-        this.add(articlesPanel);
+        //this.add(inputPanel); Remove because it is not working correctly and I don't have time to fix it
+        this.add(articlesScrollPane);
     }
 
     /**
@@ -122,6 +117,11 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             filterPanel.revalidate();    // Revalidate the layout
             filterPanel.repaint();       // Repaint the panel to reflect the changes
         }
+
+        if (evt.getPropertyName().equals("articles")){
+            final SavedArticlesState savedArticlesState = savedArticlesViewModel.getState();
+            refreshArticlePanel(savedArticlesState);
+        }
     }
 
     private JButton createCategoryButton(String category) {
@@ -138,7 +138,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         return categoryButton;
     }
 
-    // refresh the article panel to show new articles generated, following the digest use case
+    // refresh the article panel to show new articles generated,
     private void refreshArticlePanel(SavedArticlesState state) {
         articlesPanel.removeAll();
 
@@ -234,5 +234,25 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             // this.shareArticleController.execute(article);
         });
         return shareButton;
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+
+    public void setAddCategoryController(AddCategoryController addCategoryController) {
+        this.addCategoryController = addCategoryController;
+    }
+
+    public void setRemoveCategoryController(RemoveCategoryController removeCategoryController) {
+        this.removeCategoryController = removeCategoryController;
+    }
+
+    public void setUnsaveArticleController(UnsaveArticleController unsaveArticleController) {
+        this.unsaveArticleController = unsaveArticleController;
+    }
+
+    public void setNewsController(NewsController newsController) {
+        this.newsController = newsController;
     }
 }

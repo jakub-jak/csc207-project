@@ -12,6 +12,8 @@ import use_case.add_category.AddCategoryDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
 import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
+import use_case.save_article.SaveArticleDataAccessInterface;
+import use_case.saved_articles.SavedArticlesDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
 import com.mongodb.ConnectionString;
@@ -22,6 +24,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import use_case.unsave_article.UnsaveArticleDataAccessInterface;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -32,7 +35,10 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                                                     LoginUserDataAccessInterface,
                                                     LogoutUserDataAccessInterface,
                                                     RemoveCategoryDataAccessInterface,
-                                                    SignupUserDataAccessInterface {
+                                                    SignupUserDataAccessInterface,
+                                                    SaveArticleDataAccessInterface,
+                                                    UnsaveArticleDataAccessInterface,
+                                                    SavedArticlesDataAccessInterface {
     private String currentUsername;
     private final MongoCollection<Document> userCollection;
     private static String connectionString;
@@ -75,7 +81,7 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
     }
 
     public static void main(String[] args) {
-        // TODO: Remove Testing Code
+        // Testing Code
         MongoDBUserDataAccessObject db = new MongoDBUserDataAccessObject();
 
         User tempUser = new CommonUser("tempName",
@@ -120,8 +126,7 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      *
      * @param category the category to save
      */
-    //@Override
-    // TODO: Remove Override
+    @Override
     public void removeCategory(String category) {
         Bson query = Filters.eq("name", currentUsername);
         Bson update = Updates.pull("categories", category);
@@ -133,8 +138,7 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      *
      * @param article the article to save
      */
-    // TODO: remove the override
-    //@Override
+    @Override
     public void saveArticle(Article article) {
         Document articleDoc = new Document()
                 .append("title", article.getTitle())
@@ -151,15 +155,43 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
     }
 
     /**
+     * Returns the map of articles for the current user.
+     *
+     * @return the given user's articles.
+     */
+    @Override
+    public Map<String, List<Article>> getUserArticles() {
+        Document userDoc = userCollection.find(Filters.eq("name", currentUsername)).first();
+        if (userDoc == null) { return null; }
+
+        Map<String,List<Article>> articles = new HashMap<>();
+
+        Map<String,List<Document>> articlesDoc = userDoc.get("articles", Map.class);
+
+        for (String category: articlesDoc.keySet()){
+            List<Article> currArticles = new ArrayList<>();
+            for (Document articleDoc: articlesDoc.get(category)) {
+                currArticles.add(new CommonArticle(articleDoc.get("title", String.class),
+                        articleDoc.get("author", String.class),
+                        articleDoc.get("category", String.class),
+                        articleDoc.get("content", String.class),
+                        articleDoc.get("link", String.class),
+                        articleDoc.get("date", String.class),
+                        articleDoc.get("description", String.class)));
+            }
+            articles.put(category, currArticles);
+        }
+        return articles;
+    }
+
+    /**
      * Remove the article from the user's articles.
      *
      * @param article the article to save
      */
-    // TODO: remove the override
-    //@Override
+    @Override
     public void removeArticle(Article article) {
         Bson query = Filters.eq("name", currentUsername);
-        // TODO: maybe change filter to and ID
         Bson update = Updates.pull("articles." + article.getCategory(), new Document("title", article.getTitle()));
         userCollection.updateOne(query, update);
     }
