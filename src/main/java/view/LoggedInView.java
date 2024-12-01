@@ -223,6 +223,15 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.saveArticleController.execute(article);
             articlePanel.revalidate();    // Revalidate the layout
             articlePanel.repaint();       // Repaint the panel to reflect the changes
+
+            // Display a success message
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The article has been successfully saved! You can now view this article under Saved " +
+                            "Articles.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         });
         return saveButton;
     }
@@ -236,6 +245,15 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.unsaveArticleController.execute(article);
             articlePanel.revalidate();    // Revalidate the layout
             articlePanel.repaint();       // Repaint the panel to reflect the changes
+
+            // Display a success message
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The article has been successfully unsaved and will not appear under Saved Articles " +
+                            "anymore.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         });
         return unsaveButton;
     }

@@ -216,6 +216,15 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             this.unsaveArticleController.execute(article);
             articlesPanel.revalidate();    // Revalidate the layout
             articlesPanel.repaint();       // Repaint the panel to reflect the changes
+
+            // Display a success message
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The article has been successfully unsaved and will not appear under Saved Articles " +
+                            "anymore.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         });
         return unsaveButton;
     }
