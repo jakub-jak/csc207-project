@@ -8,8 +8,12 @@ import entity.Article;
 public class ShareArticleInputData {
     private final Article article;
 
-    public ShareArticleInputData(Article article) { this.article = article; }
+    public ShareArticleInputData(Article article) {
+        this.article = article;
+    }
 
-    public Article getArticle() { return article; }
+    public Article getArticle() {
+        return article;
+    }
 }
 

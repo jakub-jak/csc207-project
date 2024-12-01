@@ -2,6 +2,9 @@ package use_case.add_category;
 
 import java.util.List;
 
+/**
+ * Data Access Interface for the Add Category Use Case.
+ */
 public interface AddCategoryDataAccessInterface {
     /**
      * Saves the category to the user's categories.

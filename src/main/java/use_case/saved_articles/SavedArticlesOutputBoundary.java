@@ -1,8 +1,12 @@
 package use_case.saved_articles;
 
+/**
+ * Saved articles use case output boundary.
+ */
 public interface SavedArticlesOutputBoundary {
     /**
      * Prepares the success view for the News Case.
+     * @param savedArticleOutputData output data
      */
     void prepareSuccessView(SavedArticleOutputData savedArticleOutputData);
 

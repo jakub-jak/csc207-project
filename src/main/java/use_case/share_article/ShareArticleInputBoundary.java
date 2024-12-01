@@ -7,6 +7,7 @@ public interface ShareArticleInputBoundary {
     /**
      * Executes the share article use case.
      * @param shareArticleInputData the input data
+     * @throws Exception exception
      */
     void execute(ShareArticleInputData shareArticleInputData) throws Exception;
 }

@@ -8,7 +8,6 @@ public class LoginState {
     private String loginError;
     private String password = "";
 
-
     public String getUsername() {
         return username;
     }

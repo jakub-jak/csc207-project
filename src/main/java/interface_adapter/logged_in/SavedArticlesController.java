@@ -2,6 +2,9 @@ package interface_adapter.logged_in;
 
 import use_case.saved_articles.SavedArticlesInputBoundary;
 
+/**
+ * Saved articles controller.
+ */
 public class SavedArticlesController {
     private SavedArticlesInputBoundary savedArticlesInputBoundary;
 
@@ -9,5 +12,10 @@ public class SavedArticlesController {
         this.savedArticlesInputBoundary = savedArticlesInputBoundary;
     }
 
-    public void execute() { savedArticlesInputBoundary.execute(); }
+    /**
+     * Execute the use case.
+     */
+    public void execute() {
+        savedArticlesInputBoundary.execute();
+    }
 }

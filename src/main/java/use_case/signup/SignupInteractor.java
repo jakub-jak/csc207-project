@@ -1,13 +1,10 @@
 package use_case.signup;
 
-import entity.Article;
 import entity.CommonUser;
 import entity.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +15,6 @@ public class SignupInteractor implements SignupInputBoundary {
     private final SignupUserDataAccessInterface userDataAccessObject;
     private final SignupOutputBoundary userPresenter;
 
-
     public SignupInteractor(SignupUserDataAccessInterface signupDataAccessInterface,
                             SignupOutputBoundary signupOutputBoundary) {
         this.userDataAccessObject = signupDataAccessInterface;
@@ -27,10 +23,10 @@ public class SignupInteractor implements SignupInputBoundary {
 
     @Override
     public void execute(SignupInputData signupInputData) {
-        Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
-        Matcher m = p.matcher(signupInputData.getUsername());
-        boolean matchFound = m.matches();
-        if(!matchFound) {
+        final Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
+        final Matcher m = p.matcher(signupInputData.getUsername());
+        final boolean matchFound = m.matches();
+        if (!matchFound) {
             userPresenter.prepareFailView("This has to be a valid email address");
         }
         if (userDataAccessObject.existsByName(signupInputData.getUsername())) {

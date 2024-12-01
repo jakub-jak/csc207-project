@@ -1,12 +1,31 @@
 package use_case.digest;
 
+/**
+ * Digest Input Boundary.
+ */
 public interface DigestOutputBoundary {
+    /**
+     * Handles Error.
+     * @param errorMessage error message
+     */
     void handleError(String errorMessage);
 
+    /**
+     * Process the output.
+     * @param outputData output data
+     */
     void processOutput(DigestOutputData outputData);
 
+    /**
+     * Gets the digest output data.
+     * @return Digest output data
+     */
     DigestOutputData getOutputData();
 
+    /**
+     * Gets the error message.
+     * @return error message
+     */
     String getErrorMessage();
 
     /**

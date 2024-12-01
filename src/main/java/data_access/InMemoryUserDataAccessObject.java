@@ -23,23 +23,29 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
         SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface, ShareArticleUserDataAccessInterface {
 
     private String currentUserName;
-    private final List<User> Users = new ArrayList<User>();
+    private final List<User> users = new ArrayList<User>();
 
     @Override
     public boolean existsByName(String name) {
-        for (User user : Users) {
-            if (user.getName().equals(name)) return true;
+        for (User user : users) {
+            if (user.getName().equals(name)) {
+                return true;
+            }
         }
         return false;
     }
 
     @Override
-    public void save(User user) { Users.add(user); }
+    public void save(User user) {
+        users.add(user);
+    }
 
     @Override
     public User get(String name) {
-        for (User user : Users) {
-            if (user.getName().equals(name)) return user;
+        for (User user : users) {
+            if (user.getName().equals(name)) {
+                return user;
+            }
         }
         return null;
     }
@@ -50,47 +56,51 @@ public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterfa
     }
 
     @Override
-    public String getCurrentUsername() { return this.currentUserName;}
+    public String getCurrentUsername() {
+        return this.currentUserName;
+    }
 
     @Override
     public String getCurrentUser() {
-        if (currentUserName == null) return null;
+        if (currentUserName == null) {
+            return null;
+        }
         return currentUserName;
     }
 
     @Override
     public void saveCategory(String category) {
-        User currentUser = this.get(this.getCurrentUser());
+        final User currentUser = this.get(this.getCurrentUser());
         currentUser.addCategory(category);
     }
 
     @Override
     public void removeCategory(String category) {
-        User currentUser = this.get(this.getCurrentUser());
+        final User currentUser = this.get(this.getCurrentUser());
         currentUser.deleteCategory(category);
     }
 
     @Override
     public List<String> getUserCategories() {
-        User currentUser = this.get(this.getCurrentUser());
+        final User currentUser = this.get(this.getCurrentUser());
         return currentUser.getCategories();
     }
 
     @Override
     public void saveArticle(Article article) {
-        User currentUser = this.get(this.getCurrentUser());
+        final User currentUser = this.get(this.getCurrentUser());
         currentUser.addArticle(article);
     }
 
     @Override
     public void removeArticle(Article article) {
-        User currentUser = this.get(this.getCurrentUser());
+        final User currentUser = this.get(this.getCurrentUser());
         currentUser.deleteArticle(article);
     }
 
     @Override
     public Map<String, List<Article>> getUserArticles() {
-        User currentUser = this.get(this.getCurrentUser());
+        final User currentUser = this.get(this.getCurrentUser());
         return currentUser.getArticles();
     }
 }

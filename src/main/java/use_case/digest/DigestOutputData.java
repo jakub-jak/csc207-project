@@ -4,6 +4,9 @@ import entity.Article;
 
 import java.util.List;
 
+/**
+ * Digest Output Data object.
+ */
 public class DigestOutputData {
 
     private final List<Article> articles;

@@ -1,5 +1,8 @@
 package use_case.digest;
 
+/**
+ * Input Data object for the digest use case.
+ */
 public class DigestInputData {
 
     private final String[] keywords;

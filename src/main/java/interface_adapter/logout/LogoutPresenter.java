@@ -61,7 +61,7 @@ public class LogoutPresenter implements LogoutOutputBoundary {
     public void prepareFailView(String error) {
         // Technically this is never reached
         final LoginState loginState = loginViewModel.getState();
-        loginState.setLoginError(error); // Logout error
+        loginState.setLoginError(error);
         loginViewModel.firePropertyChanged();
     }
 }

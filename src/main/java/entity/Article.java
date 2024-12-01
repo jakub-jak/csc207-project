@@ -48,6 +48,7 @@ public interface Article {
 
     /**
      * Sets the description of the article.
+     * @param description the description to set.
      */
     void setDescription(String description);
 }

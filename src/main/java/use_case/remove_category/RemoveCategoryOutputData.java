@@ -12,5 +12,7 @@ public class RemoveCategoryOutputData {
         this.useCaseFailed = useCaseFailed;
     }
 
-    public String getCategory() { return category; }
+    public String getCategory() {
+        return category;
+    }
 }

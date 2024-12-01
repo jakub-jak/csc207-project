@@ -12,5 +12,7 @@ public class AddCategoryOutputData {
         this.useCaseFailed = useCaseFailed;
     }
 
-    public String getCategory() { return category; }
+    public String getCategory() {
+        return category;
+    }
 }
