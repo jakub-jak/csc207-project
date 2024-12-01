@@ -80,7 +80,9 @@ public class SavedArticlesPresenter implements  NewsOutputBoundary,
      */
     @Override
     public void prepareSuccessView(UnsaveArticleOutputData outputData) {
-
+        final SavedArticlesState savedArticlesState = savedArticlesViewModel.getState();
+        savedArticlesState.removeArticle(outputData.getArticle());
+        savedArticlesViewModel.firePropertyChanged("articles");
     }
 
     /**

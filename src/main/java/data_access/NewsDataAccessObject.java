@@ -120,7 +120,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
                         // Only add the article if content was successfully fetched
                         if (isContentFetched && content != null && !content.trim().isEmpty()) {
                             // Category is not available in the JSON, so set to an empty string
-                            String category = "";
+                            String category = keyword;
 
                             Article article = new CommonArticle(title, author, category, content, link, date, description);
                             articles.add(article);

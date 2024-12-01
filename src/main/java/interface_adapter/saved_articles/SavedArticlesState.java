@@ -65,4 +65,10 @@ public class SavedArticlesState {
     public void removeCategory(String category) {
         this.categoriesFilterList.remove(category);
     }
+
+    public void removeArticle(Article article) {
+        articleMap.get(article.getCategory()).remove(article);
+    }
+
+    public void setArticleMap(Map<String, List<Article>> articleMap) { this.articleMap = articleMap; }
 }
