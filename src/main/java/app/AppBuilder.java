@@ -42,6 +42,7 @@ import use_case.save_article.SaveArticleOutputBoundary;
 import use_case.saved_articles.SavedArticlesInputBoundary;
 import use_case.saved_articles.SavedArticlesInteractor;
 import use_case.saved_articles.SavedArticlesOutputBoundary;
+import use_case.share_article.ShareArticleInteractor;
 import use_case.share_article.ShareArticleOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
@@ -64,7 +65,7 @@ public class AppBuilder {
     private final MongoDBUserDataAccessObject mongoDBUserDataAccessObject = new MongoDBUserDataAccessObject();
     final NewsDataAccessObject newsDataAccessObject = new NewsDataAccessObject();
     final CohereDataAccessObject cohereDataAccessObject = new CohereDataAccessObject();
-//    final EmailDataAccessObject emailDataAccessObject = new EmailDataAccessObject();
+    final EmailDataAccessObject emailDataAccessObject = new EmailDataAccessObject();
 
     // Views & View Models
     private LoginView loginView;
@@ -287,9 +288,22 @@ public class AppBuilder {
      * @return this builder
      */
     public AppBuilder addShareArticleUseCase() {
-        // TODO: Impliment
+
+        // Instantiate Interactor
+        ShareArticleInteractor shareArticleInteractor = new ShareArticleInteractor(
+                mongoDBUserDataAccessObject, emailDataAccessObject);
+
+        // Instantiate Controller
+        ShareArticleController shareArticleController = new ShareArticleController(shareArticleInteractor);
+
+        // Set the Controller in LoggedInView
+        loggedInView.setShareArticleController(shareArticleController);
+
+        // Set the Controller in Saved Articles View
+        savedArticlesView.setShareArticleController(shareArticleController);
         return this;
     }
+
 
     /**
      * Adds the Saved Articles Use Case to the application.

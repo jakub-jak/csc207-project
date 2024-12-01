@@ -14,6 +14,7 @@ import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
 import use_case.save_article.SaveArticleDataAccessInterface;
 import use_case.saved_articles.SavedArticlesDataAccessInterface;
+import use_case.share_article.ShareArticleUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 
 import com.mongodb.ConnectionString;
@@ -38,6 +39,7 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
                                                     SignupUserDataAccessInterface,
                                                     SaveArticleDataAccessInterface,
                                                     UnsaveArticleDataAccessInterface,
+                                                    ShareArticleUserDataAccessInterface,
                                                     SavedArticlesDataAccessInterface {
     private String currentUsername;
     private final MongoCollection<Document> userCollection;
@@ -283,6 +285,16 @@ public class MongoDBUserDataAccessObject implements AddCategoryDataAccessInterfa
      */
     @Override
     public String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    /**
+     * Returns the username of the curren user of the application.
+     *
+     * @return the username of the current user
+     */
+    public String getCurrentUser() {
+        if (currentUsername == null) return null;
         return currentUsername;
     }
 
