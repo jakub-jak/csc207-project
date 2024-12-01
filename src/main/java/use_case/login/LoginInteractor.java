@@ -25,10 +25,13 @@ public class LoginInteractor implements LoginInputBoundary {
         final Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
         final Matcher m = p.matcher(username);
         final boolean matchFound = m.matches();
-        if (!matchFound) {
+        if (username.isEmpty() || password.isEmpty()) {
+            loginPresenter.prepareFailView("Please enter a valid username/password");
+        }
+        else if (!matchFound) {
             loginPresenter.prepareFailView("This has to be a valid email address.");
         }
-        if (!userDataAccessObject.existsByName(username)) {
+        else if (!userDataAccessObject.existsByName(username)) {
             loginPresenter.prepareFailView(username + ": Account does not exist.");
         }
         else {

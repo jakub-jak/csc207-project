@@ -13,18 +13,18 @@ public class LoginInteractorTest {
 
     @Test
     public void successTest() {
-        LoginInputData inputData = new LoginInputData("Paul", "password");
+        LoginInputData inputData = new LoginInputData("Paul@gmail.com", "password");
         LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
         // For the success test, we need to add Paul to the data access repository before we log in.
-        User user = new CommonUser("Paul", "password", Collections.emptyList(), Collections.emptyMap());
+        User user = new CommonUser("Paul@gmail.com", "password", Collections.emptyList(), Collections.emptyMap());
         userRepository.save(user);
 
         // This creates a successPresenter that tests whether the test case is as we expect.
         LoginOutputBoundary successPresenter = new LoginOutputBoundary() {
             @Override
             public void prepareSuccessView(LoginOutputData user) {
-                assertEquals("Paul", user.getUsername());
+                assertEquals("Paul@gmail.com", user.getUsername());
             }
 
             @Override
@@ -39,18 +39,18 @@ public class LoginInteractorTest {
 
     @Test
     public void successUserLoggedInTest() {
-        LoginInputData inputData = new LoginInputData("Paul", "password");
+        LoginInputData inputData = new LoginInputData("Paul@gmail.com", "password");
         LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
         // For the success test, we need to add Paul to the data access repository before we log in.
-        User user = new CommonUser("Paul", "password", Collections.emptyList(), Collections.emptyMap());
+        User user = new CommonUser("Paul@gmail.com", "password", Collections.emptyList(), Collections.emptyMap());
         userRepository.save(user);
 
         // This creates a successPresenter that tests whether the test case is as we expect.
         LoginOutputBoundary successPresenter = new LoginOutputBoundary() {
             @Override
             public void prepareSuccessView(LoginOutputData user) {
-                assertEquals("Paul", userRepository.getCurrentUsername());
+                assertEquals("Paul@gmail.com", userRepository.getCurrentUsername());
             }
 
             @Override
@@ -67,12 +67,12 @@ public class LoginInteractorTest {
 
     @Test
     public void failurePasswordMismatchTest() {
-        LoginInputData inputData = new LoginInputData("Paul", "wrong");
+        LoginInputData inputData = new LoginInputData("Paul@gmail.com", "wrong");
         LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
         // For this failure test, we need to add Paul to the data access repository before we log in, and
         // the passwords should not match.
-        User user = new CommonUser("Paul", "pwd", Collections.emptyList(), Collections.emptyMap());
+        User user = new CommonUser("Paul@gmail.com", "pwd", Collections.emptyList(), Collections.emptyMap());
         userRepository.save(user);
 
         // This creates a presenter that tests whether the test case is as we expect.
@@ -85,7 +85,7 @@ public class LoginInteractorTest {
 
             @Override
             public void prepareFailView(String error) {
-                assertEquals("Incorrect password for \"Paul\".", error);
+                assertEquals("Incorrect password for \"Paul@gmail.com\".", error);
             }
         };
 
@@ -95,7 +95,7 @@ public class LoginInteractorTest {
 
     @Test
     public void failureUserDoesNotExistTest() {
-        LoginInputData inputData = new LoginInputData("Paul", "password");
+        LoginInputData inputData = new LoginInputData("Paul@gmail.com", "password");
         LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
         // Add Paul to the repo so that when we check later they already exist
@@ -110,7 +110,7 @@ public class LoginInteractorTest {
 
             @Override
             public void prepareFailView(String error) {
-                assertEquals("Paul: Account does not exist.", error);
+                assertEquals("Paul@gmail.com: Account does not exist.", error);
             }
         };
 

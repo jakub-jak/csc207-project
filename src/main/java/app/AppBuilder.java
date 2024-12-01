@@ -166,8 +166,8 @@ public class AppBuilder {
         final LogoutInputBoundary logoutInputBoundary = new LogoutInteractor(mongoDBUserDataAccessObject,
                 logoutOutputBoundary);
         final LogoutController controller = new LogoutController(logoutInputBoundary);
-        // TODO: uncomment when logout is done
-        // loggedInView.setLogoutController(controller);
+
+        loggedInView.setLogoutController(controller);
         return this;
     }
 
