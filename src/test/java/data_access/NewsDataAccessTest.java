@@ -24,11 +24,11 @@ public class NewsDataAccessTest {
     public void testFetchArticlesSuccessfully() throws IOException {
         // Arrange
         String keyword = "technology";
-        String fromDate = java.time.LocalDate.now().minusDays(1).toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String language = "en";
         String sortBy = "popularity";
         int page = 1;
-        int pageSize = 5;
+        int pageSize = 20;
 
         // Act
         var articles = newsDataAccess.fetchArticlesByKeyword(keyword, fromDate, null, language, sortBy, page, pageSize);
@@ -42,7 +42,7 @@ public class NewsDataAccessTest {
     public void testFetchArticlesFailure() {
         // Arrange
         String invalidKeyword = ""; // Invalid input to simulate failure
-        String fromDate = java.time.LocalDate.now().minusDays(1).toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String language = "en";
         String sortBy = "popularity";
         int page = 1;
@@ -58,7 +58,7 @@ public class NewsDataAccessTest {
     public void testFetchFirstArticleSuccessfully() throws IOException {
         // Arrange
         String keyword = "technology";
-        String fromDate = java.time.LocalDate.now().minusDays(1).toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String toDate = null;
         String language = "en";
         String sortBy = "popularity";
@@ -76,7 +76,7 @@ public class NewsDataAccessTest {
     public void testFetchFirstArticleFailure() {
         // Arrange
         String invalidKeyword = ""; // Invalid input to simulate failure
-        String fromDate = java.time.LocalDate.now().minusDays(1).toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String toDate = null;
         String language = "en";
         String sortBy = "popularity";
@@ -91,7 +91,7 @@ public class NewsDataAccessTest {
     public void testFetchFirstMultipleSuccessfully() throws IOException {
         // Arrange
         String[] keywords = {"technology", "toy", "health"};
-        String fromDate = java.time.LocalDate.now().minusDays(1).toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String toDate = null;
         String language = "en";
         String sortBy = "popularity";
@@ -114,7 +114,7 @@ public class NewsDataAccessTest {
     public void testFetchFirstMultipleWithSomeFailures() throws IOException {
         // Arrange
         String[] keywords = {"technology", "", "health", "nonexistentkeyword123456"};
-        String fromDate = java.time.LocalDate.now().minusDays(1).toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String toDate = null;
         String language = "en";
         String sortBy = "popularity";
@@ -138,7 +138,7 @@ public class NewsDataAccessTest {
     public void testFetchFirstMultipleFailure() throws IOException {
         // Arrange
         String[] invalidKeywords = {"nonexistentkeyword123456", "anothernonexistentkeyword987654"};
-        String fromDate = java.time.LocalDate.now().toString(); // Current date
+        String fromDate = java.time.LocalDate.now().minusWeeks(1).toString(); // Current date
         String toDate = null;
         String language = "en";
         String sortBy = "popularity";
