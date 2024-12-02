@@ -31,6 +31,11 @@ public class LoginInteractorTest {
             public void prepareFailView(String error) {
                 fail("Use case failure is unexpected.");
             }
+
+            @Override
+            public void switchToSignupView() {
+
+            }
         };
 
         LoginInputBoundary interactor = new LoginInteractor(userRepository, successPresenter);
@@ -56,6 +61,11 @@ public class LoginInteractorTest {
             @Override
             public void prepareFailView(String error) {
                 fail("Use case failure is unexpected.");
+            }
+
+            @Override
+            public void switchToSignupView() {
+
             }
         };
 
@@ -87,6 +97,11 @@ public class LoginInteractorTest {
             public void prepareFailView(String error) {
                 assertEquals("Incorrect password for \"Ali@gmail.com\".", error);
             }
+
+            @Override
+            public void switchToSignupView() {
+
+            }
         };
 
         LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
@@ -109,6 +124,14 @@ public class LoginInteractorTest {
             @Override
             public void prepareFailView(String error) {
                 assertEquals("Ali@gmail.com: Account does not exist.", error);
+            }
+
+            /**
+             * Switches to the Signup View.
+             */
+            @Override
+            public void switchToSignupView() {
+
             }
         };
 

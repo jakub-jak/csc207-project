@@ -154,6 +154,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             articleDescription.setEditable(false);
             articleDescription.setBackground(articleSlide.getBackground());
 
+
             // Calculate max width of the description as half of the window size
             final int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
             final int height = 100;

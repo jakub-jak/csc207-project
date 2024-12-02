@@ -29,7 +29,7 @@ public class SignupInteractor implements SignupInputBoundary {
         if (!matchFound) {
             userPresenter.prepareFailView("This has to be a valid email address");
         }
-        if (userDataAccessObject.existsByName(signupInputData.getUsername())) {
+        else if (userDataAccessObject.existsByName(signupInputData.getUsername())) {
             userPresenter.prepareFailView("User already exists.");
         }
         else if (!signupInputData.getPassword().equals(signupInputData.getRepeatPassword())) {
