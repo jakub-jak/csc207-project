@@ -14,7 +14,7 @@ public class SignupInteractorTest {
 
     @Test
     public void successTest() {
-        SignupInputData inputData = new SignupInputData("Paul@gmail.com", "password", "password");
+        SignupInputData inputData = new SignupInputData("Ali@gmail.com", "password", "password");
         SignupUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
         // This creates a successPresenter that tests whether the test case is as we expect.
@@ -22,8 +22,8 @@ public class SignupInteractorTest {
             @Override
             public void prepareSuccessView(SignupOutputData user) {
                 // 2 things to check: the output data is correct, and the user has been created in the DAO.
-                assertEquals("Paul@gmail.com", user.getUsername());
-                assertTrue(userRepository.existsByName("Paul@gmail.com"));
+                assertEquals("Ali@gmail.com", user.getUsername());
+                assertTrue(userRepository.existsByName("Ali@gmail.com"));
             }
 
             @Override
@@ -43,7 +43,7 @@ public class SignupInteractorTest {
 
     @Test
     public void failurePasswordMismatchTest() {
-        SignupInputData inputData = new SignupInputData("Paul@gmail.com", "password", "wrong");
+        SignupInputData inputData = new SignupInputData("Ali@gmail.com", "password", "wrong");
         SignupUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
         // This creates a presenter that tests whether the test case is as we expect.
@@ -71,11 +71,11 @@ public class SignupInteractorTest {
 
     @Test
     public void failureUserExistsTest() {
-        SignupInputData inputData = new SignupInputData("Paul@gmail.com", "password", "wrong");
+        SignupInputData inputData = new SignupInputData("Ali@gmail.com", "password", "wrong");
         SignupUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
 
-        // Add Paul to the repo so that when we check later they already exist
-        User user = new CommonUser("Paul@gmail.com", "pwd", Collections.emptyList(), Collections.emptyMap());
+        // Add Ali to the repo so that when we check later they already exist
+        User user = new CommonUser("Ali@gmail.com", "pwd", Collections.emptyList(), Collections.emptyMap());
         userRepository.save(user);
 
         // This creates a presenter that tests whether the test case is as we expect.
