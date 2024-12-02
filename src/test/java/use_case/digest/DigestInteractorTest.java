@@ -25,7 +25,7 @@ public class DigestInteractorTest {
     public void testDigestInteractorSuccess() {
         // Arrange
         DigestInputData inputData = new DigestInputData(new String[]{"technology", "health"},
-                java.time.LocalDate.now().minusDays(1).toString(),
+                java.time.LocalDate.now().minusWeeks(1).toString(),
                 java.time.LocalDate.now().toString(),
                 "en",
                 "popularity");
@@ -61,7 +61,7 @@ public class DigestInteractorTest {
         // Arrange
         DigestInputData inputData = new DigestInputData(
                 new String[]{"nonexistentkeyword123456", "anothernonexistentkeyword987654"},
-                java.time.LocalDate.now().minusDays(1).toString(),
+                java.time.LocalDate.now().minusWeeks(1).toString(),
                 java.time.LocalDate.now().toString(),
                 "en",
                 "popularity"
@@ -90,7 +90,7 @@ public class DigestInteractorTest {
         // Arrange
         DigestInputData inputData = new DigestInputData(
                 new String[]{"technology", "nonexistentkeyword123456"},
-                java.time.LocalDate.now().minusDays(1).toString(),
+                java.time.LocalDate.now().minusWeeks(1).toString(),
                 java.time.LocalDate.now().toString(),
                 "en",
                 "popularity"
