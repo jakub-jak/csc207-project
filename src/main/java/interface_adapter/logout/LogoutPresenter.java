@@ -59,7 +59,8 @@ public class LogoutPresenter implements LogoutOutputBoundary {
 
     @Override
     public void prepareFailView(String error) {
-        // Technically this is never reached
+        // Technically this is never reached with our UI,
+        // but it would happen when trying to logout before a user is logged in
         final LoginState loginState = loginViewModel.getState();
         loginState.setLoginError(error);
         loginViewModel.firePropertyChanged();
