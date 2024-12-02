@@ -1,14 +1,20 @@
 package data_access;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import okhttp3.*;
-import use_case.digest.DigestCohereDataAccessInterface;
-
+// Standard Java imports
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+
+// Third-party imports
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import use_case.digest.DigestCohereDataAccessInterface;
 
 /**
  * The DAO for interacting with the Cohere API.
@@ -81,7 +87,13 @@ public class CohereDataAccessObject implements DigestCohereDataAccessInterface {
             }
             else {
                 // Handle error
-                final String errorBody = response.body() != null ? response.body().string() : "No response body";
+                final String errorBody;
+                if (response.body() != null) {
+                    errorBody = response.body().string();
+                }
+                else {
+                    errorBody = "No response body";
+                }
                 throw new IOException("Error: HTTP response code " + response.code() + "\n" + errorBody);
             }
         }

@@ -1,9 +1,9 @@
 package use_case.digest;
 
-import entity.Article;
-
 import java.io.IOException;
 import java.util.List;
+
+import entity.Article;
 
 /**
  * Data Access Interface for the Digest Use Case for the News API.
