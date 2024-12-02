@@ -86,7 +86,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
 
             final List<JsonObject> articleJsonObjects = parseArticlesFromJson(jsonResponse);
 
-            final List<Callable<Article>> tasks = createArticleFetchTasks(articleJsonObjects);
+            final List<Callable<Article>> tasks = createArticleFetchTasks(articleJsonObjects, keyword);
 
             articles.addAll(executeArticleFetchTasks(tasks));
 
@@ -170,7 +170,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
         return articleJsonObjects;
     }
 
-    private List<Callable<Article>> createArticleFetchTasks(List<JsonObject> articleJsonObjects) {
+    private List<Callable<Article>> createArticleFetchTasks(List<JsonObject> articleJsonObjects, String keyword) {
         final List<Callable<Article>> tasks = new ArrayList<>();
 
         for (JsonObject articleObject : articleJsonObjects) {
@@ -180,12 +180,17 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
             final String date = getJsonString(articleObject, "publishedAt");
             final String description = "";
 
-            tasks.add(() -> fetchArticleContent(title, author, link, date, description));
+            tasks.add(() -> fetchArticleContent(title, author, link, date, description, keyword));
         }
         return tasks;
     }
 
-    private Article fetchArticleContent(String title, String author, String link, String date, String description) {
+    private Article fetchArticleContent(String title,
+                                        String author,
+                                        String link,
+                                        String date,
+                                        String description,
+                                        String keyword) {
         Article result = null;
 
         if (isUrlReachable(link)) {
@@ -193,7 +198,7 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
             if (htmlContent != null) {
                 final String content = extractMainContent(Jsoup.parse(htmlContent, link));
                 if (content != null && !content.trim().isEmpty()) {
-                    final String category = "";
+                    final String category = keyword;
                     result = new CommonArticle(title, author, category, content, link, date, description);
                 }
                 else {
