@@ -21,9 +21,15 @@ public class UnsaveArticleInteractor implements UnsaveArticleInputBoundary {
     @Override
     public void execute(UnsaveArticleInputData unsaveArticleInputData) {
         final Article article = unsaveArticleInputData.getArticle();
+        final Map<String, List<Article>> articles = unsaveArticleDataAccessObject.getUserArticles();
 
-        unsaveArticleDataAccessObject.removeArticle(article);
-        final UnsaveArticleOutputData unsaveArticleOutputData = new UnsaveArticleOutputData(article, false);
-        unsaveArticlePresenter.prepareSuccessView(unsaveArticleOutputData);
+        if (!articles.containsKey(article.getCategory()) || !articles.get(article.getCategory()).contains(article)) {
+            unsaveArticlePresenter.prepareFailView("Article is not saved.");
+        }
+        else {
+            unsaveArticleDataAccessObject.removeArticle(article);
+            final UnsaveArticleOutputData unsaveArticleOutputData = new UnsaveArticleOutputData(article, false);
+            unsaveArticlePresenter.prepareSuccessView(unsaveArticleOutputData);
+        }
     }
 }
