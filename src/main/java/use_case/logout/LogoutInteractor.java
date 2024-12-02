@@ -20,7 +20,12 @@ public class LogoutInteractor implements LogoutInputBoundary {
         // * instantiate the `LogoutOutputData`, which needs to contain the username.
         // * tell the presenter to prepare a success view.
         final String name = logoutInputData.getName();
-        userDataAccessObject.setCurrentUsername(null);
-        logoutPresenter.prepareSuccessView(new LogoutOutputData(name, false));
+        if (!userDataAccessObject.existsByName(name)) {
+            logoutPresenter.prepareFailView(name + ": Account does not exist.");
+        }
+        else {
+            userDataAccessObject.setCurrentUsername(null);
+            logoutPresenter.prepareSuccessView(new LogoutOutputData(name, false));
+        }
     }
 }

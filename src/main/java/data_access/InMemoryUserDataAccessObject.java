@@ -4,6 +4,7 @@ import entity.Article;
 import entity.User;
 import use_case.add_category.AddCategoryDataAccessInterface;
 import use_case.login.LoginUserDataAccessInterface;
+import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
 import use_case.save_article.SaveArticleDataAccessInterface;
 import use_case.share_article.ShareArticleUserDataAccessInterface;
@@ -19,7 +20,7 @@ import java.util.Map;
  * NOT persist data between runs of the program.
  */
 public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface,
-        LoginUserDataAccessInterface, AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface,
+        LoginUserDataAccessInterface, LogoutUserDataAccessInterface, AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface,
         SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface, ShareArticleUserDataAccessInterface {
 
     private String currentUserName;
