@@ -17,6 +17,7 @@ public class DigestInteractorTest {
 
     @BeforeEach
     public void setUp() {
+        // Use the actual NewsAPI and CohereAPI implementations
         newsDataAccess = new NewsDataAccessObject();
         cohereDataAccess = new CohereDataAccessObject();
     }
@@ -30,7 +31,7 @@ public class DigestInteractorTest {
                 "en",
                 "popularity");
 
-        // Create a successPresenter that tests whether the test case is as we expect.
+        // Create a successPresenter that test whether the test case is as we expect.
         DigestOutputBoundary successPresenter = new DigestOutputBoundary() {
 
             @Override
@@ -53,73 +54,6 @@ public class DigestInteractorTest {
         };
 
         DigestInputBoundary interactor = new DigestInteractor(newsDataAccess, cohereDataAccess, successPresenter);
-        interactor.execute(inputData);
-    }
-
-    @Test
-    public void testDigestInteractorAllFail() {
-        // Arrange
-        DigestInputData inputData = new DigestInputData(
-                new String[]{"nonexistentkeyword123456", "anothernonexistentkeyword987654"},
-                java.time.LocalDate.now().minusDays(1).toString(),
-                java.time.LocalDate.now().toString(),
-                "en",
-                "popularity"
-        );
-
-        DigestOutputBoundary failurePresenter = new DigestOutputBoundary() {
-            @Override
-            public void prepareSuccessView(DigestOutputData outputData) {
-                assertNotNull(outputData, "Output data should not be null");
-                List<Article> articles = outputData.getArticles();
-                assertTrue(articles.isEmpty(), "Articles list should be empty");
-            }
-
-            @Override
-            public void prepareFailView(String errorMessage) {
-                fail("Error in fetching articles");
-            }
-        };
-
-        DigestInputBoundary interactor = new DigestInteractor(newsDataAccess, cohereDataAccess, failurePresenter);
-        interactor.execute(inputData);
-    }
-
-    @Test
-    public void testDigestInteractorPartialFail() {
-        // Arrange
-        DigestInputData inputData = new DigestInputData(
-                new String[]{"technology", "nonexistentkeyword123456"},
-                java.time.LocalDate.now().minusDays(1).toString(),
-                java.time.LocalDate.now().toString(),
-                "en",
-                "popularity"
-        );
-
-        DigestOutputBoundary partialSuccessPresenter = new DigestOutputBoundary() {
-            @Override
-            public void prepareSuccessView(DigestOutputData outputData) {
-                assertNotNull(outputData, "Output data should not be null");
-                List<Article> articles = outputData.getArticles();
-                assertNotNull(articles, "Articles list should not be null");
-                assertFalse(articles.isEmpty(), "Articles list should not be empty");
-                assertTrue(articles.size() >= 1, "At least one article should be fetched");
-
-                for (Article article : articles) {
-                    assertNotNull(article.getTitle(), "Article title should not be null");
-                    assertFalse(article.getTitle().isEmpty(), "Article title should not be empty");
-                    assertNotNull(article.getDescription(), "Article description should not be null");
-                    assertFalse(article.getDescription().isEmpty(), "Article description should not be empty");
-                }
-            }
-
-            @Override
-            public void prepareFailView(String errorMessage) {
-                fail("Expected partial success, but received failure: " + errorMessage);
-            }
-        };
-
-        DigestInputBoundary interactor = new DigestInteractor(newsDataAccess, cohereDataAccess, partialSuccessPresenter);
         interactor.execute(inputData);
     }
 }

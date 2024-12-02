@@ -1,8 +1,8 @@
 package use_case.digest;
 
-import java.util.List;
-
 import entity.Article;
+
+import java.util.List;
 
 /**
  * Digest Output Data object.

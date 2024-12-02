@@ -1,10 +1,10 @@
 package use_case.digest;
 
+import entity.Article;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import entity.Article;
 
 /**
  * Digest interactor.
@@ -14,9 +14,7 @@ public class DigestInteractor implements DigestInputBoundary {
     private final DigestCohereDataAccessInterface digestCohereDataAccessInterface;
     private final DigestOutputBoundary digestPresenter;
 
-    public DigestInteractor(DigestNewsDataAccessInterface digestNewsDataAccessInterface,
-                            DigestCohereDataAccessInterface digestCohereDataAccessInterface,
-                            DigestOutputBoundary digestPresenter) {
+    public DigestInteractor(DigestNewsDataAccessInterface digestNewsDataAccessInterface, DigestCohereDataAccessInterface digestCohereDataAccessInterface, DigestOutputBoundary digestPresenter) {
         this.digestNewsDataAccessInterface = digestNewsDataAccessInterface;
         this.digestCohereDataAccessInterface = digestCohereDataAccessInterface;
         this.digestPresenter = digestPresenter;
