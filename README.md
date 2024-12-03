@@ -61,6 +61,7 @@ Hriday Chhaochharia - hridaychh
   - password: CSC207project
 - Agree to the requested permissions displayed on the browser.
 - The browser will then display that the user may continue back to the application. Open the application window.
+- Click [here](https://youtu.be/pXDVigbl1DE) for a visual guide.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
