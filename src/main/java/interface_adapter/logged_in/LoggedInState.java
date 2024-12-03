@@ -1,9 +1,9 @@
 package interface_adapter.logged_in;
 
-import entity.Article;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import entity.Article;
 
 /**
  * The State information representing the logged-in user.
@@ -13,13 +13,6 @@ public class LoggedInState {
     private String loggedInError;
     private List<String> categoriesList = new ArrayList<>();
     private List<Article> articleList = new ArrayList<>();
-
-
-    public LoggedInState(LoggedInState copy) {
-        username = copy.username;
-        categoriesList = copy.categoriesList;
-        articleList = copy.articleList;
-    }
 
     // Because of the previous copy constructor, the default constructor must be explicit.
     public LoggedInState() {

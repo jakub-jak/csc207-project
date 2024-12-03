@@ -1,21 +1,40 @@
 package view;
 
-import entity.Article;
-import interface_adapter.digest.DigestController;
-import interface_adapter.logged_in.*;
-import interface_adapter.logout.LogoutController;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import entity.Article;
+import interface_adapter.digest.DigestController;
+import interface_adapter.logged_in.AddCategoryController;
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.logged_in.RemoveCategoryController;
+import interface_adapter.logged_in.SaveArticleController;
+import interface_adapter.logged_in.SavedArticlesController;
+import interface_adapter.logged_in.ShareArticleController;
+import interface_adapter.logged_in.UnsaveArticleController;
+import interface_adapter.logout.LogoutController;
 
 /**
  * The View for when the user is logged into the program.
  */
 public class LoggedInView extends JPanel implements PropertyChangeListener {
 
-    private final String viewName = "logged in";
     private final LoggedInViewModel loggedInViewModel;
     private final JPanel categoryButtonsPanel;
     private final JPanel articlePanel;
@@ -36,7 +55,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         // Navbar Panel
         final JPanel navigationPanel = new JPanel();
         final JButton savedArticlesButton = new JButton("Saved Articles");
-        savedArticlesButton.addActionListener(e -> {
+        savedArticlesButton.addActionListener(event -> {
             this.savedArticlesController.execute();
         });
 
@@ -114,59 +133,56 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Gets the view name.
+     * @return returns the view name
+     */
+
     public String getViewName() {
+        final String viewName;
+        viewName = "logged in";
         return viewName;
     }
 
     // refresh the article panel to show new articles generated, following the digest use case
     private void refreshArticlePanel(LoggedInState state) {
         articlePanel.removeAll();
-
-        for (Article article: state.getArticleList()){
+        for (Article article: state.getArticleList()) {
             final JPanel articleSlide = new JPanel();
             articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS));
             final String fontName = "Arial";
             final int fontSize12 = 12;
             final int fontSize14 = 14;
-
             // Title
             final JLabel articleTitle = new JLabel(article.getTitle());
             articleTitle.setFont(new Font(fontName, Font.BOLD, fontSize14));
-
             // Author
             final JLabel articleAuthor = new JLabel(article.getAuthor());
             articleAuthor.setFont(new Font(fontName, Font.PLAIN, fontSize14));
-
             // Date
             final JLabel articleDate = new JLabel(article.getDate());
             articleDate.setFont(new Font(fontName, Font.PLAIN, fontSize12));
-
             // Link
             final JLabel articleLink = new JLabel(article.getLink());
             articleLink.setFont(new Font(fontName, Font.PLAIN, fontSize12));
             articleLink.setForeground(Color.BLUE);
-
             // Description
             final JTextArea articleDescription = new JTextArea(article.getDescription());
-            articleDescription.setFont(new Font("Arial", Font.PLAIN, 12));
+            articleDescription.setFont(new Font("Arial", Font.PLAIN, fontSize12));
             articleDescription.setLineWrap(true);
             articleDescription.setWrapStyleWord(true);
             articleDescription.setEditable(false);
             articleDescription.setBackground(articleSlide.getBackground());
-
-
             // Calculate max width of the description as half of the window size
             final int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
             final int height = 100;
             articleDescription.setPreferredSize(new Dimension(maxWidth, height));
             final JScrollPane descriptionScrollPane = new JScrollPane(articleDescription);
-
             // save / un-save / share buttons
             final JPanel buttonPanel = new JPanel();
             buttonPanel.add(createSaveButton(article));
             buttonPanel.add(createUnsaveButton(article));
             buttonPanel.add(createShareButton(article));
-
             // Add labels to article slide panel
             articleSlide.add(articleTitle);
             articleSlide.add(articleAuthor);
@@ -174,7 +190,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             articleSlide.add(articleLink);
             articleSlide.add(descriptionScrollPane);
             articleSlide.add(buttonPanel);
-
             // Add a divider (separator) after each article
             final JSeparator separator = new JSeparator();
             articlePanel.add(articleSlide);
@@ -235,7 +250,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.saveArticleController.execute(article);
             articlePanel.revalidate();
             articlePanel.repaint();
-
             // Display a success message
             JOptionPane.showMessageDialog(
                     null,
@@ -257,7 +271,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.unsaveArticleController.execute(article);
             articlePanel.revalidate();
             articlePanel.repaint();
-
             // Display a success message
             JOptionPane.showMessageDialog(
                     null,
