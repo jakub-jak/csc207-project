@@ -183,6 +183,8 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             buttonPanel.add(createSaveButton(article));
             buttonPanel.add(createUnsaveButton(article));
             buttonPanel.add(createShareButton(article));
+            buttonPanel.add(createShareToOthersButton(article));
+
             // Add labels to article slide panel
             articleSlide.add(articleTitle);
             articleSlide.add(articleAuthor);
@@ -313,6 +315,57 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         return shareButton;
     }
+
+    private JButton createShareToOthersButton(Article article) {
+        final JButton shareToOthersButton = new JButton("Share to other email");
+        shareToOthersButton.setBackground(Color.GREEN);
+
+        shareToOthersButton.addActionListener(e -> {
+            // Show an input dialog to get the recipient's email
+            final String recipientEmail = JOptionPane.showInputDialog(
+                    null,
+                    "Enter the recipient's email address:",
+                    "Share Article",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (recipientEmail == null || recipientEmail.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "No email address was entered. Please try again.",
+                        "Input Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            try {
+                // Execute the share article use case for another email
+                this.shareArticleController.executeToOtherEmail(article, recipientEmail);
+
+                // Show a success popup message
+                JOptionPane.showMessageDialog(
+                        null,
+                        "The article has been successfully sent to " + recipientEmail + ".",
+                        "Email Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (Exception ex) {
+                // Show an error popup message in case of an exception
+                JOptionPane.showMessageDialog(
+                        null,
+                        "An error occurred while sending the email. Please try again. " +
+                                "You might want to check if the email address entered is valid.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                throw new RuntimeException(ex);
+            }
+        });
+
+        return shareToOthersButton;
+    }
+
 
     public void setAddCategoryController(AddCategoryController addCategoryController) {
         this.addCategoryController = addCategoryController;

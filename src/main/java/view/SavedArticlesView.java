@@ -5,6 +5,7 @@ import interface_adapter.logged_in.AddCategoryController;
 import interface_adapter.logged_in.RemoveCategoryController;
 import interface_adapter.logged_in.ShareArticleController;
 import interface_adapter.logged_in.UnsaveArticleController;
+import interface_adapter.logout.LogoutController;
 import interface_adapter.saved_articles.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +28,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private UnsaveArticleController unsaveArticleController;
     private ShareArticleController shareArticleController;
     private NewsController newsController;
+    private LogoutController logoutController;
 
     public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel) {
         this.savedArticlesViewModel = savedArticlesViewModel;
@@ -46,16 +48,15 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             this.newsController.execute();
         });
         final JLabel savedArticlesTitleLabel = new JLabel("Saved Articles");
-        // TODO: add action listener to go to the login view
-        final JButton LogoutButton = new JButton("Log out");
+
         navigationPanel.add(newsButton);
         navigationPanel.add(savedArticlesTitleLabel);
-        navigationPanel.add(LogoutButton);
+        navigationPanel.add(createLogoutButton());
 
         // Input Panel
-        JPanel inputPanel = new JPanel();
+        final JPanel inputPanel = new JPanel();
         inputPanel.add(new JLabel("Filter By Categories:"));
-        JTextField categoriesFilter = new JTextField(16);
+        final JTextField categoriesFilter = new JTextField(16);
         inputPanel.add(categoriesFilter);
 
         // Add category filter button and use case
@@ -113,7 +114,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().startsWith("add category: ")){
+        if (evt.getPropertyName().startsWith("add category: ")) {
             final String category = evt.getPropertyName().substring("add category: ".length());
             final JButton categoryButton = createCategoryButton(category);
             filterPanel.add(categoryButton);
@@ -125,6 +126,15 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             final SavedArticlesState savedArticlesState = savedArticlesViewModel.getState();
             refreshArticlePanel(savedArticlesState);
         }
+    }
+
+    private JButton createLogoutButton() {
+        final JButton generateButton = new JButton("Logout");
+        generateButton.addActionListener(actionEvent -> {
+            // execute logout use case
+            this.logoutController.execute(savedArticlesViewModel.getState().getUsername());
+        });
+        return generateButton;
     }
 
     private JButton createCategoryButton(String category) {
@@ -145,7 +155,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private void refreshArticlePanel(SavedArticlesState state) {
         articlesPanel.removeAll();
 
-        for (Article article: state.getArticleList()){
+        for (Article article: state.getArticleList()) {
             final JPanel articleSlide = getArticleSlide(article);
             
             // Add a divider (separator) after each article
@@ -201,6 +211,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         final JPanel buttonPanel = new JPanel();
         buttonPanel.add(createUnsaveButton(article));
         buttonPanel.add(createShareButton(article));
+        buttonPanel.add(createShareToOthersButton(article));
 
         // Add labels to article slide panel
         articleSlide.add(articleTitle);
@@ -265,6 +276,56 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
         return shareButton;
     }
 
+    private JButton createShareToOthersButton(Article article) {
+        final JButton shareToOthersButton = new JButton("Share to other email");
+        shareToOthersButton.setBackground(Color.GREEN);
+
+        shareToOthersButton.addActionListener(e -> {
+            // Show an input dialog to get the recipient's email
+            final String recipientEmail = JOptionPane.showInputDialog(
+                    null,
+                    "Enter the recipient's email address:",
+                    "Share Article",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (recipientEmail == null || recipientEmail.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "No email address was entered. Please try again.",
+                        "Input Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            try {
+                // Execute the share article use case for another email
+                this.shareArticleController.executeToOtherEmail(article, recipientEmail);
+
+                // Show a success popup message
+                JOptionPane.showMessageDialog(
+                        null,
+                        "The article has been successfully sent to " + recipientEmail + ".",
+                        "Email Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (Exception ex) {
+                // Show an error popup message in case of an exception
+                JOptionPane.showMessageDialog(
+                        null,
+                        "An error occurred while sending the email. Please try again. " +
+                                "You might want to check if the email address entered is valid.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                throw new RuntimeException(ex);
+            }
+        });
+
+        return shareToOthersButton;
+    }
+
     public String getViewName() {
         return viewName;
     }
@@ -283,6 +344,10 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
 
     public void setShareArticleController(ShareArticleController shareArticleController) {
         this.shareArticleController = shareArticleController;
+    }
+
+    public void setLogoutController(LogoutController logoutController) {
+        this.logoutController = logoutController;
     }
 
     public void setNewsController(NewsController newsController) {

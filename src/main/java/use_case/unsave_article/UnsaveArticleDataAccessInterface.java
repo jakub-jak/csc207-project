@@ -1,9 +1,9 @@
 package use_case.unsave_article;
 
-import entity.Article;
-
 import java.util.List;
 import java.util.Map;
+
+import entity.Article;
 
 /**
  * Unsave Article Data Acess Interface.
