@@ -1,4 +1,7 @@
-# csc207-project
+# SmartNews: AI News Digest
+
+## Contributors
+
 Ali Elbadrawy - alihosam-dev
 
 Jakub Jakuszewski - slendyduck
@@ -9,12 +12,74 @@ Dimitar Toshev - toshoboss
 
 Hriday Chhaochharia - hridaychh
 
-Alex received his digest today and saw a politics article within the digest and decided he doesn’t want to receive articles of that topic anymore. Alex logs onto the program and clicks on the Update Preferences button and de-selects politics, then clicks save. The next digest he receives doesn’t contain any articles related to politics. [Ali’s Story]
+## Table of Contents
+- [Purpose](#purpose)
+- [Software Features](#software-features)
+- [Installation Instructions](#installation-instructions)
+- [Usage Guide](#usage-guide)
+- [Feedback](#feedback)
+- [Contributions](#contributions)
 
-John wants to create a personalized digest focused on topics and keywords he previously selected. When generating the digest, the system should automatically search for relevant articles on these topics, summarize each one using an AI assistant, and present them with a brief description, title, link, publication date, and author. [Jakub’s Story]
 
-Bob recently changed his main email address and now wants to receive his weekly digests in his new email. Bob logs onto the program, clicks the profile icon, selects the box to change his email, and saves. The next digest will be sent to his new email with the same preferences as before. [Chet’s Story]
+## Purpose
 
-Alice has been using the daily digest feature for a while but decides that she not longer wants to receive email updates. She navigates to the homepage of the application and selects the opt out button to stop receiving email notifications. She will now not be sent an digest email every day. [Dimitar’s Story]
+- **What it does:**
+    - Allows users to enter keywords and receive relevant news articles.
+    - Generates concise summaries of these news articles with AI.
+    - Users can save or share the summarized articles via email.
 
-Mark is conducting a study on a particular MNC and wants to stay updated on relevant news. He logs into the app, navigates to the “Update Preferences” section, and selects “Corporate News” and “MNCs” as his preferred topics. His app now displays articles related to his chosen topics. While reading the digest, he notices some articles that are particularly useful for his study. Mark clicks the star icon at the bottom of these articles to save them. Later, he logs into the app and finds all his saved articles conveniently listed under the “My Articles” section for easy reference. [Hriday’s Story]
+- **Why it was made:**
+    - To address the challenge of information overload.
+    - Helps users quickly stay updated on important news without sifting through long articles.
+
+- **What problem it solves:**
+    - Saves time by providing relevant, easy-to-digest summaries.
+    - Makes it easier for users to stay informed and share news with others.
+
+## Software Features
+
+### Keyword-Based Article Summaries
+- Enter keywords (e.g., "technology", "health", etc.) and press generate. The app will fetch relevant news articles from the web and generate a concise, easy-to-read summary of each article.
+
+### Save Summaries for Later
+- Users can save the generated summarized articles for later reading by pressing the save button. This feature is helpful for revisiting important articles or keeping a record of the summaries.
+
+### Share Summaries via Email
+- Users can share the generated summarized articles directly via email, making it easy to send key news to friends, family, or colleagues.
+
+
+## Installation Instructions
+- Clone the Project from GitHub to your local repository.
+- Create a .env file in the project directory.
+- Fill in the correct environment variables in the .env file corresponding to the .env.template file. (You can find temporary .env files [here](https://docs.google.com/document/d/1lAfy1HOj_1hAgsB34hC2Ef0vrUziLUotw0me-yYG4-A/edit?usp=sharing))
+- Make sure all maven dependencies are installed if they have not been installed automatically.
+
+## Usage Guide
+- Navigate to src/main/java/app/MainApplication.java and run the file.
+- A browser tab will open on your computer asking you to log in to a Gmail account. Log in with the following credentials:
+  - email: newsbuddyapp@gmail.com
+  - password: CSC207project
+- Agree to the requested permissions displayed on the browser.
+- The browser will then display that the user may continue back to the application. Open the application window.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Feedback
+- Fill out this [Google Form](https://forms.gle/B58iNJ1ZAMXUJHsR7) to submit feedback the project maintainers.
+
+## Contributions
+- How to Contribute:
+    - Fork this Repository (click <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo">here</a> for instructions on how to do this).
+    - Clone your fork using git clone. Create a new branch, make your changes, and commit.
+    - Push your changes to GitHub, and crate a pull request (PR)  (click <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork">here</a> for instructions on how to do this).
+- Guidelines for Pull Requests:
+    - Adhere to Clean Architecture and SOLID design principles.
+    - Use the Checkstyle plugin to highlight all style issues and address them.
+    - Provide a detailed description of what your PR accomplishes, what it has changed, and why it is valuable.
+    - PR should only add one feature.
+- Review Protocol:
+    - A project maintainer will review your PR, comment on any necessary features, and then choose to either approve your PR, make changes to your PR, or deny your PR. 
+
+
+
