@@ -156,17 +156,13 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
      * Gets the view name.
      * @return returns the view name
      */
-
     public String getViewName() {
-        final String viewName;
-        viewName = "logged in";
-        return viewName;
+        return "logged in";
     }
 
     // refresh the article panel to show new articles generated, following the digest use case
     private void refreshArticlePanel(LoggedInState state) {
         articlePanel.removeAll();
-
 
         for (Article article: state.getArticleList()) {
             final JPanel articleSlide = new JPanel();
@@ -274,15 +270,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.saveArticleController.execute(article);
             articlePanel.revalidate();
             articlePanel.repaint();
-
-            // Display a success message
-            JOptionPane.showMessageDialog(
-                    null,
-                    "The article has been successfully saved! You can now view this article under Saved "
-                            + "Articles.",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
         });
         return saveButton;
     }
@@ -296,14 +283,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.unsaveArticleController.execute(article);
             articlePanel.revalidate();
             articlePanel.repaint();
-            // Display a success message
-            JOptionPane.showMessageDialog(
-                    null,
-                    "The article has been successfully unsaved and will not appear under Saved Articles "
-                            + "anymore.",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
         });
         return unsaveButton;
     }
@@ -377,8 +356,8 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
                 // Show an error popup message in case of an exception
                 JOptionPane.showMessageDialog(
                         null,
-                        "An error occurred while sending the email. Please try again. " +
-                                "You might want to check if the email address entered is valid.",
+                        "An error occurred while sending the email. Please try again. "
+                                + "You might want to check if the email address entered is valid.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
