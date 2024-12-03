@@ -57,15 +57,11 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         // Category Panel
         final JPanel categoryPanel = new JPanel();
+        categoryPanel.add(inputPanel);
+        categoryPanel.add(createGenerateButton());
 
         categoryButtonsPanel = new JPanel();
         categoryButtonsPanel.setLayout(new FlowLayout());
-
-        final JButton generateButton = createGenerateButton();
-
-        // inputPanel.add(generateButton);  // consider putting this in the input panel
-        categoryPanel.add(inputPanel);
-        categoryPanel.add(generateButton);
 
         // Article Panel
         articlePanel = new JPanel();
@@ -98,19 +94,42 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             articlePanel.revalidate();
             articlePanel.repaint();
         }
-
-        if (evt.getPropertyName().startsWith("add category: ")) {
+        else if (evt.getPropertyName().startsWith("add category: ")) {
             final String category = evt.getPropertyName().substring("add category: ".length());
             final JButton categoryButton = createCategoryButton(category);
             categoryButtonsPanel.add(categoryButton);
             categoryButtonsPanel.revalidate();
             categoryButtonsPanel.repaint();
         }
-
-        // Populate the articlePanel with articles for each article the user generates.
-        if (evt.getPropertyName().equals("articles")) {
+        else if (evt.getPropertyName().equals("articles")) {
+            // Populate the articlePanel with articles for each article the user generates.
             final LoggedInState state = (LoggedInState) evt.getNewValue();
             refreshArticlePanel(state);
+        }
+        else if (evt.getPropertyName().equals("articles add")) {
+            // Display a success message
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The article has been successfully saved! You can now view this article under Saved "
+                            + "Articles.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        }
+        else if (evt.getPropertyName().equals("articles remove")) {
+            // Display a success message
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The article has been successfully unsaved and will not appear under Saved Articles "
+                            + "anymore.",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        }
+        else if (evt.getPropertyName().equals("Article is not saved.") || evt
+                .getPropertyName().equals("Article already saved.")) {
+            // Display an error message
+            JOptionPane.showMessageDialog(this, evt.getPropertyName(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -122,7 +141,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     private void refreshArticlePanel(LoggedInState state) {
         articlePanel.removeAll();
 
-        for (Article article: state.getArticleList()){
+        for (Article article: state.getArticleList()) {
             final JPanel articleSlide = new JPanel();
             articleSlide.setLayout(new BoxLayout(articleSlide, BoxLayout.Y_AXIS));
             final String fontName = "Arial";
@@ -153,7 +172,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             articleDescription.setWrapStyleWord(true);
             articleDescription.setEditable(false);
             articleDescription.setBackground(articleSlide.getBackground());
-
 
             // Calculate max width of the description as half of the window size
             final int maxWidth = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
@@ -219,12 +237,12 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
     }
 
     private JButton createLogoutButton() {
-        final JButton generateButton = new JButton("Logout");
-        generateButton.addActionListener(actionEvent -> {
+        final JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(actionEvent -> {
             // execute logout use case
             this.logoutController.execute(loggedInViewModel.getState().getUsername());
         });
-        return generateButton;
+        return logoutButton;
     }
 
     private JButton createSaveButton(Article article) {
@@ -236,15 +254,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.saveArticleController.execute(article);
             articlePanel.revalidate();
             articlePanel.repaint();
-
-            // Display a success message
-            JOptionPane.showMessageDialog(
-                    null,
-                    "The article has been successfully saved! You can now view this article under Saved "
-                            + "Articles.",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
         });
         return saveButton;
     }
@@ -258,15 +267,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             this.unsaveArticleController.execute(article);
             articlePanel.revalidate();
             articlePanel.repaint();
-
-            // Display a success message
-            JOptionPane.showMessageDialog(
-                    null,
-                    "The article has been successfully unsaved and will not appear under Saved Articles "
-                            + "anymore.",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
         });
         return unsaveButton;
     }
