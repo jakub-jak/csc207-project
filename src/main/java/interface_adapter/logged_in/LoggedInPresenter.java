@@ -103,7 +103,7 @@ public class LoggedInPresenter implements LogoutOutputBoundary,
     public void prepareFailView(String error) {
         final LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setLoggedInError(error);
-        loggedInViewModel.firePropertyChanged();
+        loggedInViewModel.firePropertyChanged(error);
     }
 
 }
