@@ -368,7 +368,6 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         return shareToOthersButton;
     }
 
-
     public void setAddCategoryController(AddCategoryController addCategoryController) {
         this.addCategoryController = addCategoryController;
     }
