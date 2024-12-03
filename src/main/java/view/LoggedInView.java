@@ -165,6 +165,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
             buttonPanel.add(createSaveButton(article));
             buttonPanel.add(createUnsaveButton(article));
             buttonPanel.add(createShareButton(article));
+            buttonPanel.add(createShareToOthersButton(article));
 
             // Add labels to article slide panel
             articleSlide.add(articleTitle);
@@ -299,14 +300,14 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
 
         return shareButton;
     }
-/*
+
     private JButton createShareToOthersButton(Article article) {
-        JButton shareToOthersButton = new JButton("Share to other email");
+        final JButton shareToOthersButton = new JButton("Share to other email");
         shareToOthersButton.setBackground(Color.GREEN);
 
         shareToOthersButton.addActionListener(e -> {
             // Show an input dialog to get the recipient's email
-            String recipientEmail = JOptionPane.showInputDialog(
+            final String recipientEmail = JOptionPane.showInputDialog(
                     null,
                     "Enter the recipient's email address:",
                     "Share Article",
@@ -320,7 +321,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
                         "Input Error",
                         JOptionPane.WARNING_MESSAGE
                 );
-                return; // Exit if no email was entered
+                return;
             }
 
             try {
@@ -348,8 +349,7 @@ public class LoggedInView extends JPanel implements PropertyChangeListener {
         });
 
         return shareToOthersButton;
-    }*/
-
+    }
 
 
     public void setAddCategoryController(AddCategoryController addCategoryController) {

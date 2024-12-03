@@ -10,4 +10,6 @@ public interface ShareArticleInputBoundary {
      * @throws Exception exception
      */
     void execute(ShareArticleInputData shareArticleInputData) throws Exception;
+
+    void executeToOtherEmail(ShareArticleInputData2 shareArticleInputData2) throws Exception;
 }
