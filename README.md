@@ -49,25 +49,37 @@ Hriday Chhaochharia - hridaychh
 
 
 ## Installation Instructions
-- TODO: add documentation for installation instructions
+- Clone the Project from GitHub to your local repository.
+- Create a .env file in the project directory.
+- Fill in the correct environment variables in the .env file corresponding to the .env.template file. (You can find temporary .env files [here](https://docs.google.com/document/d/1lAfy1HOj_1hAgsB34hC2Ef0vrUziLUotw0me-yYG4-A/edit?usp=sharing))
+- Make sure all maven dependencies are installed if they have not been installed automatically.
 
 ## Usage Guide
-- TODO
+- Navigate to src/main/java/app/MainApplication.java and run the file.
+- A browser tab will open on your computer asking you to log in to a Gmail account. Log in with the following credentials:
+  - email: newsbuddyapp@gmail.com
+  - password: CSC207project
+- Agree to the requested permissions displayed on the browser.
+- The browser will then display that the user may continue back to the application. Open the application window.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Feedback
-- TODO
+- Fill out this [Google Form](https://forms.gle/B58iNJ1ZAMXUJHsR7) to submit feedback the project maintainers.
 
 ## Contributions
 - How to Contribute:
     - Fork this Repository (click <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo">here</a> for instructions on how to do this).
     - Clone your fork using git clone. Create a new branch, make your changes, and commit.
     - Push your changes to GitHub, and crate a pull request (PR)  (click <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork">here</a> for instructions on how to do this).
-- TODO: add more details according to the checklist
-
-
+- Guidelines for Pull Requests:
+    - Adhere to Clean Architecture and SOLID design principles.
+    - Use the Checkstyle plugin to highlight all style issues and address them.
+    - Provide a detailed description of what your PR accomplishes, what it has changed, and why it is valuable.
+    - PR should only add one feature.
+- Review Protocol:
+    - A project maintainer will review your PR, comment on any necessary features, and then choose to either approve your PR, make changes to your PR, or deny your PR. 
 
 
 
