@@ -7,6 +7,7 @@ import use_case.login.LoginUserDataAccessInterface;
 import use_case.logout.LogoutUserDataAccessInterface;
 import use_case.remove_category.RemoveCategoryDataAccessInterface;
 import use_case.save_article.SaveArticleDataAccessInterface;
+import use_case.saved_articles.SavedArticlesDataAccessInterface;
 import use_case.share_article.ShareArticleUserDataAccessInterface;
 import use_case.signup.SignupUserDataAccessInterface;
 import use_case.unsave_article.UnsaveArticleDataAccessInterface;
@@ -20,8 +21,10 @@ import java.util.Map;
  * NOT persist data between runs of the program.
  */
 public class InMemoryUserDataAccessObject implements SignupUserDataAccessInterface,
-        LoginUserDataAccessInterface, LogoutUserDataAccessInterface, AddCategoryDataAccessInterface, RemoveCategoryDataAccessInterface,
-        SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface, ShareArticleUserDataAccessInterface {
+        LoginUserDataAccessInterface, LogoutUserDataAccessInterface, AddCategoryDataAccessInterface,
+        RemoveCategoryDataAccessInterface,
+        SaveArticleDataAccessInterface, UnsaveArticleDataAccessInterface, ShareArticleUserDataAccessInterface,
+        SavedArticlesDataAccessInterface {
 
     private String currentUserName;
     private final List<User> users = new ArrayList<User>();

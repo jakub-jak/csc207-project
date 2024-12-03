@@ -18,6 +18,13 @@ public class SavedArticlesInteractor implements SavedArticlesInputBoundary {
         final SavedArticleOutputData savedArticleOutputData =
                 new SavedArticleOutputData(savedArticlesDataAccessInterface
                         .get(savedArticlesDataAccessInterface.getCurrentUsername()));
-        savedArticlesOutputBoundary.prepareSuccessView(savedArticleOutputData);
+
+        try {
+            savedArticleOutputData.getUser().getName();
+            savedArticlesOutputBoundary.prepareSuccessView(savedArticleOutputData);
+        }
+        catch (NullPointerException nullPointerException) {
+            savedArticlesOutputBoundary.prepareFailView("No user logged in.");
+        }
     }
 }
