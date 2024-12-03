@@ -32,25 +32,29 @@ public class DigestInteractor implements DigestInputBoundary {
 
         List<Article> articles = new ArrayList<>();
 
+        Boolean fail = false;
+
         try {
             articles = digestNewsDataAccessInterface.fetchFirstMultiple(keywords, fromDate, toDate, language, sortBy);
         }
         catch (IOException ioException) {
             digestPresenter.prepareFailView("Error in fetching articles");
-            ioException.printStackTrace();
+            fail = true;
         }
 
-        for (Article article : articles) {
-            try {
-                article.setDescription(digestCohereDataAccessInterface.summarize(article.getContent()));
+        if (!fail) {
+            for (Article article : articles) {
+                try {
+                    article.setDescription(digestCohereDataAccessInterface.summarize(article.getContent()));
+                }
+                catch (IOException ioException) {
+                    article.setDescription("Error in summarizing article");
+                    ioException.printStackTrace();
+                }
             }
-            catch (IOException ioException) {
-                article.setDescription("Error in summarizing article");
-                ioException.printStackTrace();
-            }
-        }
 
-        final DigestOutputData digestOutputData = new DigestOutputData(articles);
-        digestPresenter.prepareSuccessView(digestOutputData);
+            final DigestOutputData digestOutputData = new DigestOutputData(articles);
+            digestPresenter.prepareSuccessView(digestOutputData);
+        }
     }
 }

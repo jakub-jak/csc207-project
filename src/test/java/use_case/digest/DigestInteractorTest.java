@@ -1,11 +1,15 @@
 package use_case.digest;
 
+import entity.CommonArticle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import data_access.NewsDataAccessObject;
 import data_access.CohereDataAccessObject;
 import entity.Article;
+import org.mockito.Mockito;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -121,5 +125,97 @@ public class DigestInteractorTest {
 
         DigestInputBoundary interactor = new DigestInteractor(newsDataAccess, cohereDataAccess, partialSuccessPresenter);
         interactor.execute(inputData);
+    }
+    @Test
+    public void testNewsDataAccessIOException() throws IOException {
+        // Arrange
+        DigestNewsDataAccessInterface newsDataAccess = Mockito.mock(DigestNewsDataAccessInterface.class);
+        DigestCohereDataAccessInterface cohereDataAccess = Mockito.mock(DigestCohereDataAccessInterface.class);
+        DigestOutputBoundary presenter = Mockito.mock(DigestOutputBoundary.class);
+
+        // Simulate IOException when fetching articles
+        Mockito.when(newsDataAccess.fetchFirstMultiple(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any()
+        )).thenThrow(new IOException("Simulated news data access failure"));
+
+        // Create the interactor
+        DigestInputBoundary interactor = new DigestInteractor(
+                newsDataAccess,
+                cohereDataAccess,
+                presenter
+        );
+
+        // Create input data
+        DigestInputData inputData = new DigestInputData(
+                new String[]{"technology"},
+                java.time.LocalDate.now().minusWeeks(1).toString(),
+                java.time.LocalDate.now().toString(),
+                "en",
+                "popularity"
+        );
+
+        // Act
+        interactor.execute(inputData);
+
+        // Assert
+        Mockito.verify(presenter).prepareFailView(Mockito.eq("Error in fetching articles"));
+        Mockito.verify(presenter, Mockito.never()).prepareSuccessView(Mockito.any());
+    }
+
+    @Test
+    public void testCohereDataAccessIOException() throws IOException {
+        // Arrange
+        DigestNewsDataAccessInterface newsDataAccess = Mockito.mock(DigestNewsDataAccessInterface.class);
+        DigestCohereDataAccessInterface cohereDataAccess = Mockito.mock(DigestCohereDataAccessInterface.class);
+        DigestOutputBoundary presenter = Mockito.mock(DigestOutputBoundary.class);
+
+        // Prepare a list of articles to be returned by news data access
+        List<Article> articles = new ArrayList<>();
+        Article article = new CommonArticle("", "", "", "Some content", "", "", "");
+        articles.add(article);
+
+        // Simulate successful news data access
+        Mockito.when(newsDataAccess.fetchFirstMultiple(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any()
+        )).thenReturn(articles);
+
+        // Simulate IOException during summarization
+        Mockito.when(cohereDataAccess.summarize(Mockito.anyString()))
+                .thenThrow(new IOException("Simulated Cohere data access failure"));
+
+        // Create the interactor
+        DigestInputBoundary interactor = new DigestInteractor(
+                newsDataAccess,
+                cohereDataAccess,
+                presenter
+        );
+
+        // Create input data
+        DigestInputData inputData = new DigestInputData(
+                new String[]{"technology"},
+                java.time.LocalDate.now().minusWeeks(1).toString(),
+                java.time.LocalDate.now().toString(),
+                "en",
+                "popularity"
+        );
+
+        // Act
+        interactor.execute(inputData);
+
+        // Assert
+        // Verify that prepareSuccessView is called with an article with error description
+        Mockito.verify(presenter).prepareSuccessView(Mockito.argThat(outputData -> {
+            List<Article> processedArticles = outputData.getArticles();
+            return !processedArticles.isEmpty() &&
+                    processedArticles.get(0).getDescription().equals("Error in summarizing article");
+        }));
     }
 }
