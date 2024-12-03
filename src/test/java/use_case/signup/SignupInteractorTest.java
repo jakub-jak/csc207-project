@@ -97,7 +97,65 @@ public class SignupInteractorTest {
             }
         };
 
+
+
+
+
         SignupInputBoundary interactor = new SignupInteractor(userRepository, failurePresenter);
         interactor.execute(inputData);
     }
+
+    @Test
+    public void failureInvalidEmailTest() {
+        SignupInputData inputData = new SignupInputData("ali", "password", "password");
+        SignupUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+
+        // This creates a presenter that tests whether the test case is as we expect.
+        SignupOutputBoundary failurePresenter = new SignupOutputBoundary() {
+            @Override
+            public void prepareSuccessView(SignupOutputData user) {
+                fail("Use case success is unexpected.");
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                assertEquals("This has to be a valid email address", error);
+            }
+
+            @Override
+            public void switchToLoginView() {
+                // This is expected
+            }
+        };
+
+        SignupInputBoundary interactor = new SignupInteractor(userRepository, failurePresenter);
+        interactor.execute(inputData);
+    }
+
+    @Test
+    public void switchToLoginViewTest() {
+        SignupUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+
+        SignupOutputBoundary switchPresenter = new SignupOutputBoundary() {
+            @Override
+            public void prepareSuccessView(SignupOutputData user) {
+                fail("Use case success is unexpected.");
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                fail("Use case failure is unexpected.");
+            }
+
+            @Override
+            public void switchToLoginView() {
+                // Assert that this is called
+                assertTrue(true);
+            }
+        };
+
+        SignupInputBoundary interactor = new SignupInteractor(userRepository, switchPresenter);
+        interactor.switchToLoginView();
+    }
+
 }

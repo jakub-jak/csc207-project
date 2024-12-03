@@ -138,4 +138,108 @@ public class LoginInteractorTest {
         LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
         interactor.execute(inputData);
     }
+    @Test
+    public void failureInvalidEmailTest() {
+        LoginInputData inputData = new LoginInputData("invalid-email", "password");
+        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+
+        LoginOutputBoundary failurePresenter = new LoginOutputBoundary() {
+            @Override
+            public void prepareSuccessView(LoginOutputData user) {
+                fail("Use case success is unexpected.");
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                assertEquals("This has to be a valid email address.", error);
+            }
+
+            @Override
+            public void switchToSignupView() {
+                // This is expected
+            }
+        };
+
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
+        interactor.execute(inputData);
+    }
+
+    @Test
+    public void failureEmptyUsername() {
+        LoginInputData inputData = new LoginInputData("", "password");
+        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+
+        LoginOutputBoundary failurePresenter = new LoginOutputBoundary() {
+            @Override
+            public void prepareSuccessView(LoginOutputData user) {
+                fail("Use case success is unexpected.");
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                assertEquals("Please enter a valid username/password", error);
+            }
+
+            @Override
+            public void switchToSignupView() {
+                // This is expected
+            }
+        };
+
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
+        interactor.execute(inputData);
+    }
+
+    @Test
+    public void failureEmptyPassword() {
+        LoginInputData inputData = new LoginInputData("ali@gmail.com", "");
+        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+
+        LoginOutputBoundary failurePresenter = new LoginOutputBoundary() {
+            @Override
+            public void prepareSuccessView(LoginOutputData user) {
+                fail("Use case success is unexpected.");
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                assertEquals("Please enter a valid username/password", error);
+            }
+
+            @Override
+            public void switchToSignupView() {
+                // This is expected
+            }
+        };
+
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, failurePresenter);
+        interactor.execute(inputData);
+    }
+
+    @Test
+    public void switchToSignupViewTest() {
+        LoginUserDataAccessInterface userRepository = new InMemoryUserDataAccessObject();
+
+        LoginOutputBoundary switchPresenter = new LoginOutputBoundary() {
+            @Override
+            public void prepareSuccessView(LoginOutputData user) {
+                fail("Use case success is unexpected.");
+            }
+
+            @Override
+            public void prepareFailView(String error) {
+                fail("Use case failure is unexpected.");
+            }
+
+            @Override
+            public void switchToSignupView() {
+                // Assert that this is called
+                assertTrue(true);
+            }
+        };
+
+        LoginInputBoundary interactor = new LoginInteractor(userRepository, switchPresenter);
+        interactor.switchToSignupView();
+    }
+
 }
