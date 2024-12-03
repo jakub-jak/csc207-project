@@ -1,12 +1,12 @@
 package use_case.signup;
 
-import entity.CommonUser;
-import entity.User;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import entity.CommonUser;
+import entity.User;
 
 /**
  * The Signup Interactor.
@@ -36,7 +36,8 @@ public class SignupInteractor implements SignupInputBoundary {
             userPresenter.prepareFailView("Passwords don't match.");
         }
         else {
-            final User user = new CommonUser(signupInputData.getUsername(), signupInputData.getPassword(), new ArrayList<>(), new HashMap<>());
+            final User user = new CommonUser(signupInputData.getUsername(), signupInputData.getPassword(),
+                    new ArrayList<>(), new HashMap<>());
             userDataAccessObject.save(user);
 
             final SignupOutputData signupOutputData = new SignupOutputData(user.getName(), false);

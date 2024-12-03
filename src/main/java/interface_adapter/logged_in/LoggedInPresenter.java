@@ -3,15 +3,14 @@ package interface_adapter.logged_in;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
-
 import interface_adapter.saved_articles.SavedArticlesState;
 import interface_adapter.saved_articles.SavedArticlesViewModel;
+import use_case.add_category.AddCategoryOutputBoundary;
+import use_case.add_category.AddCategoryOutputData;
 import use_case.digest.DigestOutputBoundary;
 import use_case.digest.DigestOutputData;
 import use_case.logout.LogoutOutputBoundary;
 import use_case.logout.LogoutOutputData;
-import use_case.add_category.AddCategoryOutputBoundary;
-import use_case.add_category.AddCategoryOutputData;
 import use_case.remove_category.RemoveCategoryOutputBoundary;
 import use_case.remove_category.RemoveCategoryOutputData;
 import use_case.save_article.SaveArticleOutputBoundary;
@@ -20,8 +19,6 @@ import use_case.saved_articles.SavedArticleOutputData;
 import use_case.saved_articles.SavedArticlesOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputBoundary;
 import use_case.unsave_article.UnsaveArticleOutputData;
-
-import java.util.ArrayList;
 
 /**
  * The Presenter for the Change Password Use Case.
