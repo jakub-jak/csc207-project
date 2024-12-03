@@ -9,11 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 // Third-party imports
@@ -26,6 +21,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import command.ArticleCommand;
+import command.ArticleInvoker;
+import command.FetchArticleCommand;
 import entity.Article;
 import entity.CommonArticle;
 import okhttp3.OkHttpClient;
@@ -86,14 +84,14 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
 
             final List<JsonObject> articleJsonObjects = parseArticlesFromJson(jsonResponse);
 
-            final List<Callable<Article>> tasks = createArticleFetchTasks(articleJsonObjects, keyword);
+            final List<ArticleCommand> commands = createArticleFetchCommands(articleJsonObjects, keyword);
 
-            articles.addAll(executeArticleFetchTasks(tasks));
+            articles.addAll(executeArticleFetchCommands(commands));
 
             return articles;
 
         }
-        catch (IOException ioException) {
+        catch (IOException | InterruptedException ioException) {
             throw new IOException("Error fetching articles: " + ioException.getMessage(), ioException);
         }
     }
@@ -170,8 +168,8 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
         return articleJsonObjects;
     }
 
-    private List<Callable<Article>> createArticleFetchTasks(List<JsonObject> articleJsonObjects, String keyword) {
-        final List<Callable<Article>> tasks = new ArrayList<>();
+    private List<ArticleCommand> createArticleFetchCommands(List<JsonObject> articleJsonObjects, String keyword) {
+        final List<ArticleCommand> commands = new ArrayList<>();
 
         for (JsonObject articleObject : articleJsonObjects) {
             final String title = getJsonString(articleObject, "title");
@@ -180,17 +178,27 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
             final String date = getJsonString(articleObject, "publishedAt");
             final String description = "";
 
-            tasks.add(() -> fetchArticleContent(title, author, link, date, description, keyword));
+            commands.add(new FetchArticleCommand(this, title, author, link, date, description, keyword));
         }
-        return tasks;
+        return commands;
     }
 
-    private Article fetchArticleContent(String title,
-                                        String author,
-                                        String link,
-                                        String date,
-                                        String description,
-                                        String keyword) {
+    /**
+     * Retrieves article content.
+     * @param title title
+     * @param author author
+     * @param link link
+     * @param date date
+     * @param description description
+     * @param keyword keyword
+     * @return article
+     */
+    public Article fetchArticleContent(String title,
+                                       String author,
+                                       String link,
+                                       String date,
+                                       String description,
+                                       String keyword) {
         Article result = null;
 
         if (isUrlReachable(link)) {
@@ -265,33 +273,9 @@ public class NewsDataAccessObject implements DigestNewsDataAccessInterface {
         return result;
     }
 
-    private List<Article> executeArticleFetchTasks(List<Callable<Article>> tasks) {
-        final List<Article> articles = new ArrayList<>();
-        final ExecutorService executorService = Executors.newFixedThreadPool(10);
-
-        try {
-            final List<Future<Article>> futures = executorService.invokeAll(tasks);
-
-            for (Future<Article> future : futures) {
-                try {
-                    final Article article = future.get();
-                    if (article != null) {
-                        articles.add(article);
-                    }
-                }
-                catch (InterruptedException | ExecutionException executionException) {
-                    System.err.println("Error fetching article: " + executionException.getMessage());
-                }
-            }
-        }
-        catch (InterruptedException interruptedException) {
-            System.err.println("Task execution interrupted: " + interruptedException.getMessage());
-        }
-        finally {
-            executorService.shutdown();
-        }
-
-        return articles;
+    private List<Article> executeArticleFetchCommands(List<ArticleCommand> commands) throws InterruptedException {
+        final ArticleInvoker invoker = new ArticleInvoker(10);
+        return invoker.executeCommands(commands);
     }
 
     private String extractMainContent(Document doc) {
