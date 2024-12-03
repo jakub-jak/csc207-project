@@ -168,6 +168,7 @@ public class AppBuilder {
         final LogoutController controller = new LogoutController(logoutInputBoundary);
 
         loggedInView.setLogoutController(controller);
+        savedArticlesView.setLogoutController(controller);
         return this;
     }
 

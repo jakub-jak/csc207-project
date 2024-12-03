@@ -5,6 +5,7 @@ import interface_adapter.logged_in.AddCategoryController;
 import interface_adapter.logged_in.RemoveCategoryController;
 import interface_adapter.logged_in.ShareArticleController;
 import interface_adapter.logged_in.UnsaveArticleController;
+import interface_adapter.logout.LogoutController;
 import interface_adapter.saved_articles.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +28,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private UnsaveArticleController unsaveArticleController;
     private ShareArticleController shareArticleController;
     private NewsController newsController;
+    private LogoutController logoutController;
 
     public SavedArticlesView(SavedArticlesViewModel savedArticlesViewModel) {
         this.savedArticlesViewModel = savedArticlesViewModel;
@@ -46,16 +48,15 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             this.newsController.execute();
         });
         final JLabel savedArticlesTitleLabel = new JLabel("Saved Articles");
-        // TODO: add action listener to go to the login view
-        final JButton LogoutButton = new JButton("Log out");
+
         navigationPanel.add(newsButton);
         navigationPanel.add(savedArticlesTitleLabel);
-        navigationPanel.add(LogoutButton);
+        navigationPanel.add(createLogoutButton());
 
         // Input Panel
-        JPanel inputPanel = new JPanel();
+        final JPanel inputPanel = new JPanel();
         inputPanel.add(new JLabel("Filter By Categories:"));
-        JTextField categoriesFilter = new JTextField(16);
+        final JTextField categoriesFilter = new JTextField(16);
         inputPanel.add(categoriesFilter);
 
         // Add category filter button and use case
@@ -113,7 +114,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().startsWith("add category: ")){
+        if (evt.getPropertyName().startsWith("add category: ")) {
             final String category = evt.getPropertyName().substring("add category: ".length());
             final JButton categoryButton = createCategoryButton(category);
             filterPanel.add(categoryButton);
@@ -125,6 +126,15 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
             final SavedArticlesState savedArticlesState = savedArticlesViewModel.getState();
             refreshArticlePanel(savedArticlesState);
         }
+    }
+
+    private JButton createLogoutButton() {
+        final JButton generateButton = new JButton("Logout");
+        generateButton.addActionListener(actionEvent -> {
+            // execute logout use case
+            this.logoutController.execute(savedArticlesViewModel.getState().getUsername());
+        });
+        return generateButton;
     }
 
     private JButton createCategoryButton(String category) {
@@ -145,7 +155,7 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
     private void refreshArticlePanel(SavedArticlesState state) {
         articlesPanel.removeAll();
 
-        for (Article article: state.getArticleList()){
+        for (Article article: state.getArticleList()) {
             final JPanel articleSlide = getArticleSlide(article);
             
             // Add a divider (separator) after each article
@@ -283,6 +293,10 @@ public class SavedArticlesView extends JPanel implements PropertyChangeListener 
 
     public void setShareArticleController(ShareArticleController shareArticleController) {
         this.shareArticleController = shareArticleController;
+    }
+
+    public void setLogoutController(LogoutController logoutController) {
+        this.logoutController = logoutController;
     }
 
     public void setNewsController(NewsController newsController) {
