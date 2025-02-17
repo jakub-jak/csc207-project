@@ -4,7 +4,7 @@
 
 Ali Elbadrawy - alihosam-dev
 
-Jakub Jakuszewski - slendyduck
+Jakub Jakuszewski - jakub-jak
 
 Chet Petro - chetpetro
 
